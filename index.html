@@ -201,9 +201,16 @@ h2{font:400 clamp(30px,4vw,40px)/1.1 var(--serif);margin:0;letter-spacing:-.01em
 .cases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 @media (max-width:900px){.cases{grid-template-columns:1fr}}
 .case{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:24px}
-.case .big{font:400 44px/1 var(--serif);color:var(--accent)}
-.case .big small{font-size:18px;color:var(--muted)}
-.case h4{margin:14px 0 12px;font-size:17px;font-weight:600}
+.case .metric{display:flex;align-items:center;gap:14px;min-height:72px;box-sizing:content-box;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.case .ic{flex:none;width:44px;height:44px;border-radius:12px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+.case .ic svg{width:22px;height:22px}
+.case .big{font:700 32px/1 var(--sans);letter-spacing:-.02em;color:var(--text);font-variant-numeric:tabular-nums}
+.case .big .u{color:var(--accent)}
+.case .cap{display:block;margin-top:6px;font:500 11px/1.3 var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.case .ba{display:flex;align-items:center;gap:6px;white-space:nowrap;font:600 16px/1.15 var(--sans);font-variant-numeric:tabular-nums;margin-top:2px}
+.case .ba s{color:var(--faint);font-weight:500;text-decoration-thickness:1.5px}
+.case .ba .to{color:var(--faint);font-weight:400}
+.case h4{margin:16px 0 12px;font-size:17px;font-weight:600}
 .case dl{margin:0;display:grid;gap:10px}
 .case dt{font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
 .case dd{margin:2px 0 0;color:var(--muted);font-size:14.5px}
@@ -475,21 +482,21 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
     <p class="sec-note rv">Highlights from my BI roles. The data and dashboards are confidential, so each one describes the challenge, the approach and the result.</p>
     <div class="cases">
       <article class="case rv">
-        <div class="big">10%<small> retention ↑</small></div>
+        <div class="metric"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></span><div><div class="big"><span class="u">+</span><span data-count="10">10</span><span class="u">%</span></div><span class="cap">Client retention</span></div></div>
         <h4>CRM migration &amp; client analytics</h4>
         <dl><div><dt>Challenge</dt><dd>Move client and sales data off Dynamics 365 and SQL Server without breaking the reports that sales relied on.</dd></div>
         <div><dt>Approach</dt><dd>Led the Dynamics 365 → Salesforce and SQL Server → Snowflake migrations on Azure, and embedded Power BI inside Salesforce.</dd></div>
         <div><dt>Result</dt><dd>Data-driven client tracking, built with regional sales directors, lifted institutional client retention by 10%.</dd></div></dl>
       </article>
       <article class="case rv">
-        <div class="big">0<small> manual decks</small></div>
+        <div class="metric"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 14h6l-1 7 8-11h-6l1-7z"/></svg></span><div><div class="ba"><s>Manual decks</s><span class="to">→</span><span style="color:var(--accent)">Automated</span></div><span class="cap">CEO, COO &amp; board reporting</span></div></div>
         <h4>Automated C-suite reporting</h4>
         <dl><div><dt>Challenge</dt><dd>CEO, COO and board reporting depended on manually built decks.</dd></div>
         <div><dt>Approach</dt><dd>Automated the reporting in Python, and built Power BI dashboards and a Microsoft Fabric proof of concept for liquidity and AUM.</dd></div>
         <div><dt>Result</dt><dd>Manual decks eliminated for C-suite and board reviews.</dd></div></dl>
       </article>
       <article class="case rv">
-        <div class="big">−50%<small> error</small></div>
+        <div class="metric"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r="0.8" fill="currentColor"/></svg></span><div><div class="big"><span class="u">−</span><span data-count="50">50</span><span class="u">%</span></div><span class="cap">Sales forecast error</span></div></div>
         <h4>Sales forecasting</h4>
         <dl><div><dt>Challenge</dt><dd>Sales forecast error was around 40%.</dd></div>
         <div><dt>Approach</dt><dd>Built predictive regression models, and deployed 15+ automated alerts to take over manual QA.</dd></div>
