@@ -389,6 +389,110 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
   <section id="projects">
     <div class="sec-head rv"><span class="sec-num">03</span><h2>Projects</h2></div>
 
+<div class="uaep" id="uae-dashboards">
+  <style>
+    .uaep { --uaep-line: color-mix(in srgb, currentColor 15%, transparent); --uaep-soft: color-mix(in srgb, currentColor 62%, transparent);
+      --uaep-panel: color-mix(in srgb, currentColor 3.5%, transparent); --uaep-accent: #0f6b5c; margin: 0 0 64px; }
+    .uaep, .uaep * { box-sizing: border-box; }
+    .uaep ul, .uaep dl { list-style: none; margin: 0; padding: 0; }
+    .uaep dd, .uaep figure { margin: 0; }
+    .uaep a { color: inherit; }
+    .uaep a:focus-visible { outline: 2px solid var(--uaep-accent); outline-offset: 3px; border-radius: 4px; }
+    .uaep-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 40px; align-items: start; }
+    .uaep-meta { font-size: .85em; color: var(--uaep-soft); margin: 0 0 6px; }
+    .uaep-title { margin: 0 0 12px; }
+    .uaep-lede { margin: 0 0 22px; max-width: 60ch; }
+    .uaep .uaep-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--uaep-line); border-bottom: 1px solid var(--uaep-line); margin: 0 0 20px; }
+    .uaep-stats div { padding: 12px 12px 12px 0; }
+    .uaep-stats div + div { padding-left: 14px; border-left: 1px solid var(--uaep-line); }
+    .uaep-stats dt { font-size: 1.55em; font-weight: 700; line-height: 1.15; font-variant-numeric: tabular-nums; }
+    .uaep-stats dd { font-size: .85em; color: var(--uaep-soft); }
+    .uaep .uaep-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 22px; }
+    .uaep-tags li { font-size: .8em; padding: 3px 10px; border: 1px solid var(--uaep-line); border-radius: 999px; }
+    .uaep-links { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 0; }
+    .uaep-links a { font-weight: 600; text-underline-offset: 3px; }
+
+    .uaep-preview { display: block; text-decoration: none; border: 1px solid var(--uaep-line); border-radius: 10px; background: var(--uaep-panel); overflow: hidden; transition: border-color .15s ease; }
+    .uaep-preview:hover { border-color: var(--uaep-accent); }
+    .uaep-bar { display: flex; justify-content: space-between; gap: 12px; font-size: .78em; color: var(--uaep-soft); padding: 9px 16px; border-bottom: 1px solid var(--uaep-line); }
+    .uaep-bar b { font-weight: 600; color: currentColor; }
+    .uaep-body { padding: 16px 16px 14px; }
+    .uaep-finding { font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif; font-size: 1.2em; line-height: 1.32; margin: 0 0 14px; }
+    .uaep .uaep-kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--uaep-line); margin: 0 0 12px; }
+    .uaep-kpis div { padding: 9px 10px 9px 0; }
+    .uaep-kpis div + div { padding-left: 12px; border-left: 1px solid var(--uaep-line); }
+    .uaep-kpis dt { font-weight: 700; font-size: 1.15em; font-variant-numeric: tabular-nums; line-height: 1.2; }
+    .uaep-kpis dd { font-size: .75em; color: var(--uaep-soft); }
+    .uaep-pos { color: var(--uaep-accent); }
+    .uaep-chart-label { font-size: .75em; color: var(--uaep-soft); margin: 0 0 4px; }
+    .uaep-area { display: block; width: 100%; height: 118px; }
+    .uaep-axis { display: flex; justify-content: space-between; font-size: .72em; color: var(--uaep-soft); margin-top: 4px; }
+    .uaep .uaep-legend { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 3px 12px; font-size: .72em; color: var(--uaep-soft); }
+    .uaep-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; }
+    .uaep-caption { font-size: .78em; color: var(--uaep-soft); margin: 8px 2px 0; }
+
+    .uaep .uaep-list { margin-top: 36px; border-top: 1px solid currentColor; }
+    .uaep-list a { display: grid; grid-template-columns: 170px minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 15px 0; border-bottom: 1px solid var(--uaep-line); text-decoration: none; }
+    .uaep-list span { font-size: .85em; color: var(--uaep-soft); }
+    .uaep-list strong { font-weight: 600; }
+    .uaep-list em { font-style: normal; font-size: .85em; color: var(--uaep-soft); }
+    .uaep-list a:hover strong { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+    @media (max-width: 820px) { .uaep-grid { grid-template-columns: minmax(0, 1fr); gap: 26px; } }
+    @media (max-width: 560px) {
+      .uaep-list a { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+      .uaep-list em { display: none; }
+      .uaep-stats dt { font-size: 1.3em; }
+    }
+    @media (prefers-reduced-motion: reduce) { .uaep-preview { transition: none; } }
+  </style>
+
+  <div class="uaep-grid">
+    <div>
+      <p class="uaep-meta">New · Power BI · Data modelling</p>
+      <h3 class="uaep-title">UAE industry dashboards</h3>
+      <p class="uaep-lede">Four interactive dashboards for UAE industries, built on synthetic data. Each one opens with the finding a manager needs first, written from the data, and rewrites it as the filters change. The DIFC fund house is also built as a Power BI report, with a star-schema model and a call list of clients who are pulling money out.</p>
+      <dl class="uaep-stats">
+        <div><dt>4</dt><dd>UAE industries</dd></div>
+        <div><dt>23</dt><dd>DAX measures</dd></div>
+        <div><dt>5</dt><dd>tables in a star schema</dd></div>
+      </dl>
+      <ul class="uaep-tags" aria-label="Tools used">
+        <li>Power BI</li><li>DAX</li><li>Power Query</li><li>Star schema</li><li>Python</li><li>JavaScript</li>
+      </ul>
+      <p class="uaep-links">
+        <a href="uae-dashboards/">Open the dashboards</a>
+        <a href="uae-dashboards/power-bi.html">See the Power BI report</a>
+      </p>
+    </div>
+
+    <figure>
+      <a class="uaep-preview" href="uae-dashboards/power-bi.html" aria-label="Open the DIFC fund house Power BI report">
+        <div class="uaep-bar"><span><b>DIFC fund house</b>, Overview</span><span>Power BI</span></div>
+        <div class="uaep-body">
+          <p class="uaep-finding">Private Credit beat its benchmark by 8.1 points, while Global Equity fell short by 4.8.</p>
+          <dl class="uaep-kpis">
+            <div><dt>$5.29bn</dt><dd>Assets</dd></div>
+            <div><dt class="uaep-pos">+$724m</dt><dd>Net flows</dd></div>
+            <div><dt>42.3%</dt><dd>Return</dd></div>
+          </dl>
+          <p class="uaep-chart-label">Assets by fund, US$</p>
+          <svg class="uaep-area" viewBox="0 0 340 118" preserveAspectRatio="none" role="img" aria-label="Stacked area chart: assets grew from $3.1bn in January 2024 to $5.3bn in September 2026, led by Global Equity and Sukuk and Fixed Income."><line x1="0" x2="340" y1="80.7" y2="80.7" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/><line x1="0" x2="340" y1="43.3" y2="43.3" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/><path d="M0.0,102.5 L10.6,100.6 L21.2,100.8 L31.9,99.5 L42.5,99.6 L53.1,99.3 L63.8,99.2 L74.4,99.0 L85.0,98.3 L95.6,98.7 L106.2,98.7 L116.9,97.9 L127.5,98.5 L138.1,96.9 L148.8,96.2 L159.4,95.4 L170.0,94.8 L180.6,95.7 L191.2,95.7 L201.9,95.7 L212.5,95.1 L223.1,94.0 L233.8,93.4 L244.4,91.6 L255.0,90.1 L265.6,89.9 L276.2,89.7 L286.9,88.8 L297.5,87.4 L308.1,88.3 L318.8,88.4 L329.4,86.1 L340.0,85.9 L340.0,118.0 L329.4,118.0 L318.8,118.0 L308.1,118.0 L297.5,118.0 L286.9,118.0 L276.2,118.0 L265.6,118.0 L255.0,118.0 L244.4,118.0 L233.8,118.0 L223.1,118.0 L212.5,118.0 L201.9,118.0 L191.2,118.0 L180.6,118.0 L170.0,118.0 L159.4,118.0 L148.8,118.0 L138.1,118.0 L127.5,118.0 L116.9,118.0 L106.2,118.0 L95.6,118.0 L85.0,118.0 L74.4,118.0 L63.8,118.0 L53.1,118.0 L42.5,118.0 L31.9,118.0 L21.2,118.0 L10.6,118.0 L0.0,118.0 Z" fill="#0f6b5c" fill-opacity=".88"/><path d="M0.0,94.4 L10.6,92.6 L21.2,92.6 L31.9,90.9 L42.5,91.4 L53.1,90.7 L63.8,90.7 L74.4,89.8 L85.0,89.1 L95.6,89.5 L106.2,89.9 L116.9,89.1 L127.5,89.4 L138.1,87.5 L148.8,86.9 L159.4,86.2 L170.0,84.9 L180.6,85.4 L191.2,85.2 L201.9,84.6 L212.5,83.5 L223.1,82.3 L233.8,81.5 L244.4,79.0 L255.0,76.0 L265.6,76.0 L276.2,75.8 L286.9,75.0 L297.5,73.3 L308.1,73.7 L318.8,73.7 L329.4,71.2 L340.0,70.8 L340.0,85.9 L329.4,86.1 L318.8,88.4 L308.1,88.3 L297.5,87.4 L286.9,88.8 L276.2,89.7 L265.6,89.9 L255.0,90.1 L244.4,91.6 L233.8,93.4 L223.1,94.0 L212.5,95.1 L201.9,95.7 L191.2,95.7 L180.6,95.7 L170.0,94.8 L159.4,95.4 L148.8,96.2 L138.1,96.9 L127.5,98.5 L116.9,97.9 L106.2,98.7 L95.6,98.7 L85.0,98.3 L74.4,99.0 L63.8,99.2 L53.1,99.3 L42.5,99.6 L31.9,99.5 L21.2,100.8 L10.6,100.6 L0.0,102.5 Z" fill="#b5862c" fill-opacity=".88"/><path d="M0.0,76.8 L10.6,75.2 L21.2,74.6 L31.9,73.0 L42.5,72.9 L53.1,72.5 L63.8,72.3 L74.4,71.1 L85.0,70.0 L95.6,70.0 L106.2,70.3 L116.9,69.2 L127.5,69.4 L138.1,67.0 L148.8,66.1 L159.4,65.1 L170.0,63.5 L180.6,64.0 L191.2,63.8 L201.9,63.1 L212.5,61.6 L223.1,60.4 L233.8,59.2 L244.4,56.7 L255.0,53.5 L265.6,53.0 L276.2,53.0 L286.9,52.0 L297.5,50.4 L308.1,50.4 L318.8,50.3 L329.4,47.2 L340.0,46.5 L340.0,70.8 L329.4,71.2 L318.8,73.7 L308.1,73.7 L297.5,73.3 L286.9,75.0 L276.2,75.8 L265.6,76.0 L255.0,76.0 L244.4,79.0 L233.8,81.5 L223.1,82.3 L212.5,83.5 L201.9,84.6 L191.2,85.2 L180.6,85.4 L170.0,84.9 L159.4,86.2 L148.8,86.9 L138.1,87.5 L127.5,89.4 L116.9,89.1 L106.2,89.9 L95.6,89.5 L85.0,89.1 L74.4,89.8 L63.8,90.7 L53.1,90.7 L42.5,91.4 L31.9,90.9 L21.2,92.6 L10.6,92.6 L0.0,94.4 Z" fill="#3d5a80" fill-opacity=".88"/><path d="M0.0,64.8 L10.6,62.8 L21.2,62.2 L31.9,60.2 L42.5,60.1 L53.1,60.2 L63.8,60.1 L74.4,59.3 L85.0,58.0 L95.6,58.0 L106.2,57.7 L116.9,56.4 L127.5,56.6 L138.1,54.7 L148.8,53.8 L159.4,52.7 L170.0,50.9 L180.6,51.3 L191.2,50.5 L201.9,50.0 L212.5,48.2 L223.1,47.1 L233.8,46.3 L244.4,43.7 L255.0,40.9 L265.6,40.3 L276.2,40.6 L286.9,39.3 L297.5,37.8 L308.1,37.5 L318.8,37.5 L329.4,34.6 L340.0,34.2 L340.0,46.5 L329.4,47.2 L318.8,50.3 L308.1,50.4 L297.5,50.4 L286.9,52.0 L276.2,53.0 L265.6,53.0 L255.0,53.5 L244.4,56.7 L233.8,59.2 L223.1,60.4 L212.5,61.6 L201.9,63.1 L191.2,63.8 L180.6,64.0 L170.0,63.5 L159.4,65.1 L148.8,66.1 L138.1,67.0 L127.5,69.4 L116.9,69.2 L106.2,70.3 L95.6,70.0 L85.0,70.0 L74.4,71.1 L63.8,72.3 L53.1,72.5 L42.5,72.9 L31.9,73.0 L21.2,74.6 L10.6,75.2 L0.0,76.8 Z" fill="#9a4f6b" fill-opacity=".88"/><path d="M0.0,59.1 L10.6,57.0 L21.2,56.2 L31.9,54.0 L42.5,53.7 L53.1,53.6 L63.8,53.2 L74.4,52.0 L85.0,50.6 L95.6,50.6 L106.2,50.0 L116.9,48.4 L127.5,48.2 L138.1,46.0 L148.8,44.8 L159.4,43.5 L170.0,41.3 L180.6,41.3 L191.2,40.3 L201.9,39.4 L212.5,37.5 L223.1,36.1 L233.8,35.1 L244.4,32.1 L255.0,28.9 L265.6,27.7 L276.2,27.6 L286.9,26.1 L297.5,24.2 L308.1,23.7 L318.8,23.4 L329.4,20.0 L340.0,19.3 L340.0,34.2 L329.4,34.6 L318.8,37.5 L308.1,37.5 L297.5,37.8 L286.9,39.3 L276.2,40.6 L265.6,40.3 L255.0,40.9 L244.4,43.7 L233.8,46.3 L223.1,47.1 L212.5,48.2 L201.9,50.0 L191.2,50.5 L180.6,51.3 L170.0,50.9 L159.4,52.7 L148.8,53.8 L138.1,54.7 L127.5,56.6 L116.9,56.4 L106.2,57.7 L95.6,58.0 L85.0,58.0 L74.4,59.3 L63.8,60.1 L53.1,60.2 L42.5,60.1 L31.9,60.2 L21.2,62.2 L10.6,62.8 L0.0,64.8 Z" fill="#6f8f5f" fill-opacity=".88"/></svg>
+          <div class="uaep-axis"><span>Jan 2024</span><span>Sep 2026</span></div>
+          <ul class="uaep-legend"><li><i style="background:#0f6b5c"></i>Global Equity</li><li><i style="background:#b5862c"></i>MENA Equity</li><li><i style="background:#3d5a80"></i>Sukuk & Fixed Income</li><li><i style="background:#9a4f6b"></i>Multi-Asset Balanced</li><li><i style="background:#6f8f5f"></i>Private Credit</li></ul>
+        </div>
+      </a>
+      <figcaption class="uaep-caption">All funds, January 2024 to September 2026. Synthetic data.</figcaption>
+    </figure>
+  </div>
+
+  <ul class="uaep-list">
+    <li><a href="uae-dashboards/real-estate.html"><span>Real estate</span><strong>Where in Dubai does property pay the best rent for the price?</strong><em>Web, with chat</em></a></li>
+    <li><a href="uae-dashboards/ecommerce.html"><span>E-commerce</span><strong>How much is cash on delivery really costing a UAE online store?</strong><em>Web</em></a></li>
+    <li><a href="uae-dashboards/power-bi.html"><span>Asset management</span><strong>Which funds beat their benchmark, and which clients are walking away?</strong><em>Power BI and web</em></a></li>
+    <li><a href="uae-dashboards/logistics.html"><span>Logistics</span><strong>Which delivery lanes break their promise, and why?</strong><em>Web</em></a></li>
+  </ul>
+</div>
+
     <article class="feature rv">
       <div class="feature-top">
         <div>
@@ -481,7 +585,7 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
 
   <section id="work">
     <div class="sec-head rv"><span class="sec-num">04</span><h2>Selected work</h2></div>
-    <p class="sec-note rv">Highlights from my BI roles. The data and dashboards are confidential, so each one describes the challenge, the approach and the result.</p>
+    <p class="sec-note rv">Highlights from my BI roles. The data and dashboards are confidential, so each one describes the challenge, the approach and the result. For dashboards you can open and explore, see <a href="uae-dashboards/">UAE industry dashboards</a>.</p>
     <div class="cases">
       <article class="case rv">
         <div class="metric"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l5-5 4 4 7-8"/><path d="M15 8h5v5"/></svg></span><div><div class="big"><span class="u">+</span><span data-count="10">10</span><span class="u">%</span></div><span class="cap">Client retention</span></div></div>
