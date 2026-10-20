@@ -140,7 +140,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top:
     </article>
 
     <article class="rep" id="card-difc" onclick="showReport('difc')" style="--c:#0f6b5c">
-      <p class="ind">Asset Management</p>
+      <p class="ind">Asset Management &middot; Live Video</p>
       <h3>DIFC Fund House</h3>
       <p>$5.29bn assets, net flows, benchmark performance, client call list and liquidity on a navy sidebar design.</p>
       <div class="links">
@@ -160,7 +160,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top:
     </article>
 
     <article class="rep" id="card-checkout" onclick="showReport('checkout')" style="--c:#5b3fd1">
-      <p class="ind">E-Commerce</p>
+      <p class="ind">E-Commerce &middot; Live Video</p>
       <h3>Checkout Analytics</h3>
       <p>Revenue, returns, COD fees, and delivery speed across all 7 emirates. Dark-mode icon rail design.</p>
       <div class="links">
@@ -327,46 +327,124 @@ RETURN
   <!-- VIEW 2: DIFC FUND HOUSE -->
   <div id="view-difc" class="detail-view">
     <section class="section">
-      <h2>DIFC Fund House &mdash; Interactive Demo</h2>
-      <p>Asset management executive overview: $5.29bn assets, net flows, and client liquidity ladder. <a href="asset-management.html" style="font-weight:600; color:var(--accent);">Launch interactive web dashboard &rarr;</a></p>
+      <h2>DIFC Fund House &mdash; Report Walkthrough</h2>
+      <p>Refined executive walkthrough of the live <strong>DIFC Fund House</strong> report running in Power BI Service. Watch the real-time fund performance, benchmark tracking, net flow trends, and client redemption liquidity ladder.</p>
+      <p style="margin: 0 0 12px;"><span style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, transparent); padding:4px 12px; border-radius:999px;">🎧 Includes audio walkthrough &mdash; press Play to listen</span></p>
       
       <div class="video-container">
-        <video controls loop playsinline poster="power-bi/overview.png">
-          <source src="power-bi/difc-fund-house-demo.webm" type="video/webm">
+        <video controls playsinline poster="power-bi/difc-fund-house-poster.png">
+          <source src="power-bi/difc-fund-house-demo.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
       </div>
 
-      <div class="shots" style="margin-top:20px;">
-        <figure><img src="power-bi/overview.png" alt="Overview page: headline finding, assets, flows and growth against benchmark" loading="lazy"><figcaption>Overview: headline finding, assets, flows and growth of $100 against benchmark.</figcaption></figure>
-        <figure><img src="power-bi/clients.png" alt="Clients page: client mix, regions, liquidity ladder and call list" loading="lazy"><figcaption>Clients and liquidity: client mix, regional exposure, and call list.</figcaption></figure>
+      <div style="margin-top:16px;">
+        <a href="asset-management.html" class="button" style="display:inline-flex; align-items:center; gap:6px;">Launch Interactive Web Dashboard &rarr;</a>
       </div>
     </section>
 
+    <!-- Data Lineage -->
+    <section class="section">
+      <h2>Data Lineage &amp; ETL Pipeline</h2>
+      <p>How institutional fund accounting, custody valuation, and client registry feeds flow into the Power BI semantic model.</p>
+      
+      <div class="lineage-grid">
+        <div class="lineage-step">
+          <span class="step-badge">1. Ingestion</span>
+          <h4>Custody Feeds</h4>
+          <p>Monthly fund NAV snapshots, benchmark index return time series, and anonymized client register balances.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">2. Power Query (M)</span>
+          <h4>ETL &amp; Cleansing</h4>
+          <p>Harmonized dealing term categories, mapped client domicile regions, converted multi-currency AUM to USD, and enforced relationship integrity.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">3. Data Model</span>
+          <h4>Dual-Fact Schema</h4>
+          <p>Two fact tables (<code>Fund Monthly</code> &amp; <code>Clients</code>) conformed to shared <code>Funds</code> and <code>Calendar</code> dimensions, plus a dealing-term liquidity bridge.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">4. Presentation</span>
+          <h4>Power BI Service</h4>
+          <p>Asset-weighted compounded returns via PRODUCTX, benchmark excess return comparisons, and automated client withdrawal risk alerts.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Star Schema Model -->
     <section class="section">
       <h2>Inside the DIFC Fund House Star Schema</h2>
-      <p>Two fact tables share the Funds dimension, allowing a single fund slicer to filter performance, clients, and liquidity simultaneously.</p>
+      <p>Two fact tables share the Funds dimension, allowing a single fund slicer to filter performance, clients, and liquidity simultaneously without circular dependencies.</p>
       <div class="model">
-        <div class="tbl fact"><h3>Fund Monthly</h3><p class="kind">Fact table, 165 rows</p><ul><li>Month-end assets per fund</li><li>Net flows</li><li>Fund and benchmark returns</li></ul></div>
-        <div class="tbl fact"><h3>Clients</h3><p class="kind">Fact table, 146 rows</p><ul><li>Holding in Sep 2025</li><li>Holding in Sep 2026</li><li>Client type and region</li></ul></div>
-        <div class="tbl"><h3>Funds</h3><p class="kind">Dimension, 5 rows</p><ul><li>Fund name</li><li>Asset class</li><li>Dealing terms</li></ul></div>
-        <div class="tbl"><h3>Calendar</h3><p class="kind">Dimension, 33 months</p><ul><li>Date</li><li>Year &middot; Month</li></ul></div>
-        <div class="tbl"><h3>Liquidity</h3><p class="kind">Bridge, 25 rows</p><ul><li>Dealing bucket per fund</li><li>Share of assets payable</li></ul></div>
+        <div class="tbl fact">
+          <h3>Fund Monthly</h3>
+          <p class="kind">Fact table, 165 rows</p>
+          <ul>
+            <li>Month-end assets per fund</li>
+            <li>Net capital flows</li>
+            <li>Fund monthly return</li>
+            <li>Benchmark monthly return</li>
+          </ul>
+        </div>
+        <div class="tbl fact">
+          <h3>Clients</h3>
+          <p class="kind">Fact table, 146 rows</p>
+          <ul>
+            <li>Holding in Sep 2025</li>
+            <li>Holding in Sep 2026</li>
+            <li>Client type (Private bank, Family office)</li>
+            <li>Client region</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Funds</h3>
+          <p class="kind">Dimension, 5 rows</p>
+          <ul>
+            <li>Global Equity</li>
+            <li>MENA Equity</li>
+            <li>Multi-Asset Balanced</li>
+            <li>Private Credit</li>
+            <li>Sukuk &amp; Fixed Income</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Calendar</h3>
+          <p class="kind">Dimension, 33 months</p>
+          <ul>
+            <li>Date</li>
+            <li>Year &middot; Month</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Liquidity</h3>
+          <p class="kind">Bridge, 25 rows</p>
+          <ul>
+            <li>Dealing bucket per fund</li>
+            <li>Share of assets payable</li>
+            <li>Bucket order (Next day to 90d+)</li>
+          </ul>
+        </div>
       </div>
     </section>
 
+    <!-- DAX Measures -->
     <section class="section">
-      <h2>DIFC DAX Measures</h2>
+      <h2>Core DIFC Fund House DAX Measures</h2>
+      <p>Asset management analytics powering time-weighted compound returns, liquidity stress tests, and automated redemption alerts.</p>
       <div class="dax">
         <div>
-          <h3>Return (Compounded Asset-Weighted)</h3>
+          <h3>Compounded Return (PRODUCTX)</h3>
+          <p>Calculates true asset-weighted geometric compound returns across dynamically selected multi-month holding periods.</p>
           <pre><code>Return =
 VAR selMonths = VALUES ( 'Fund Monthly'[Date] )
 RETURN
     IF ( NOT ISEMPTY ( selMonths ), PRODUCTX ( selMonths, 1 + [Monthly return] ) - 1 )</code></pre>
         </div>
+
         <div>
-          <h3>Growth of 100</h3>
+          <h3>Growth of $100 vs Benchmark</h3>
+          <p>Indexes initial capital to $100 and tracks cumulative returns over time against the benchmark index.</p>
           <pre><code>Growth of 100 =
 VAR cur = MAX ( 'Calendar'[Date] )
 VAR monthsSoFar = FILTER ( ALLSELECTED ( 'Calendar' ), 'Calendar'[Date] &lt;= cur )
@@ -375,6 +453,26 @@ RETURN
         NOT ISEMPTY ( VALUES ( 'Fund Monthly'[Date] ) ),
         100 * PRODUCTX ( monthsSoFar, 1 + [Monthly return] )
     )</code></pre>
+        </div>
+
+        <div>
+          <h3>Liquidity Payable Within 7 Days (%)</h3>
+          <p>Computes immediate capital redemption capability by evaluating dealing terms payable on Next Day or within 2 to 7 business days.</p>
+          <pre><code>Payable within 7 days =
+CALCULATE ( [Share of assets payable], Liquidity[Bucket Order] &lt;= 2 )</code></pre>
+        </div>
+
+        <div>
+          <h3>Client Redemption Alert (>20% Outflow)</h3>
+          <p>Identifies high-value institutional accounts who reduced their fund holding by more than 20% in the trailing 12 months.</p>
+          <pre><code>Clients cutting over 20 percent =
+COUNTROWS (
+    FILTER (
+        Clients,
+        Clients[Held Sep 2025] &gt; 0
+            &amp;&amp; Clients[Held Sep 2026] &lt; Clients[Held Sep 2025] * 0.8
+    )
+)</code></pre>
         </div>
       </div>
     </section>
@@ -552,9 +650,172 @@ DIVIDE (
   <!-- VIEW 4: CHECKOUT ANALYTICS -->
   <div id="view-checkout" class="detail-view">
     <section class="section">
-      <h2>Checkout Analytics &mdash; UAE E-Commerce</h2>
-      <p>Order-level analytics across 7 emirates, evaluating return rates on Cash on Delivery (COD) vs credit cards and carrier transit times.</p>
-      <p><a href="ecommerce.html" class="button" style="display:inline-block; margin-top:8px;">Open Interactive E-Commerce Dashboard &rarr;</a></p>
+      <h2>Checkout Analytics &mdash; Report Walkthrough</h2>
+      <p>Refined executive walkthrough of the live <strong>Checkout Analytics</strong> report running in Power BI Service. Watch the dark-mode order analytics, Cash on Delivery (COD) vs prepaid return rate drivers, dynamic calculation group ranking, and AI Decomposition Tree.</p>
+      <p style="margin: 0 0 12px;"><span style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, transparent); padding:4px 12px; border-radius:999px;">🎧 Includes audio walkthrough &mdash; press Play to listen</span></p>
+      
+      <div class="video-container">
+        <video controls playsinline poster="power-bi/checkout-analytics-poster.png">
+          <source src="power-bi/checkout-analytics-demo.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div style="margin-top:16px;">
+        <a href="ecommerce.html" class="button" style="display:inline-flex; align-items:center; gap:6px;">Launch Interactive Web Dashboard &rarr;</a>
+      </div>
+    </section>
+
+    <!-- Data Lineage -->
+    <section class="section">
+      <h2>Data Lineage &amp; ETL Pipeline</h2>
+      <p>How 680K+ UAE online orders flow from checkout checkout APIs and carrier manifests into the Power BI semantic model.</p>
+      
+      <div class="lineage-grid">
+        <div class="lineage-step">
+          <span class="step-badge">1. Ingestion</span>
+          <h4>Order &amp; Carrier Logs</h4>
+          <p>Order-level transactional logs, payment gateway settlement feeds (Card, COD, BNPL), and 3PL courier transit timestamps.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">2. Power Query (M)</span>
+          <h4>ETL &amp; Cleansing</h4>
+          <p>Calculated transit days between dispatch and customer handover, mapped COD handling fees, standardizes 7 emirates, and parsed return reasons.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">3. Data Model</span>
+          <h4>Star Schema</h4>
+          <p>Central <code>Sales Orders</code> fact linked 1-to-many with <code>Emirates</code>, <code>Categories</code>, <code>Channels</code>, <code>Payments</code>, and <code>Calendar</code>.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">4. Presentation</span>
+          <h4>Power BI Service</h4>
+          <p>Dynamic metric ranking via SWITCH DAX, automated smart narrative generation, and interactive AI Decomposition Tree root-cause drill-downs.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Star Schema Model -->
+    <section class="section">
+      <h2>Inside the Checkout Analytics Star Schema</h2>
+      <p>An enterprise retail data model engineered to analyze order unit economics, payment method risks, and last-mile logistics efficiency.</p>
+      <div class="model">
+        <div class="tbl fact">
+          <h3>Sales Orders</h3>
+          <p class="kind">Central Fact Table</p>
+          <ul>
+            <li>Revenue AED</li>
+            <li>Order Count</li>
+            <li>Return Count</li>
+            <li>COD Order Count</li>
+            <li>COD Return Count</li>
+            <li>Delivery Days Total</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Emirates</h3>
+          <p class="kind">Dimension (7 rows)</p>
+          <ul>
+            <li>Dubai</li>
+            <li>Abu Dhabi</li>
+            <li>Sharjah</li>
+            <li>Ajman</li>
+            <li>Ras Al Khaimah</li>
+            <li>Fujairah</li>
+            <li>Umm Al Quwain</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Categories</h3>
+          <p class="kind">Dimension (5 rows)</p>
+          <ul>
+            <li>Electronics</li>
+            <li>Fashion</li>
+            <li>Home &amp; Kitchen</li>
+            <li>Beauty</li>
+            <li>Grocery</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Channels</h3>
+          <p class="kind">Dimension (3 rows)</p>
+          <ul>
+            <li>Mobile App</li>
+            <li>Web Storefront</li>
+            <li>Social Marketplace</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Metric</h3>
+          <p class="kind">Parameter Bridge</p>
+          <ul>
+            <li>Revenue (AED M)</li>
+            <li>Orders (thousands)</li>
+            <li>Return rate (%)</li>
+            <li>Cash on delivery (%)</li>
+            <li>Delivery time (days)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAX Measures -->
+    <section class="section">
+      <h2>Core Checkout Analytics DAX Measures</h2>
+      <p>Business logic analyzing payment return disparities, fulfillment duration, and dynamic visual metric switching.</p>
+      
+      <div class="dax">
+        <div>
+          <h3>Dynamic Metric Selector (Calculation Parameter)</h3>
+          <p>Dynamically swaps the visual measure in the emirate ranking chart based on user slicer selection.</p>
+          <pre><code>Selected metric =
+VAR pick = SELECTEDVALUE ( Metric[Metric], "Revenue (AED M)" )
+RETURN
+    SWITCH (
+        pick,
+        "Revenue (AED M)", [Revenue] / 1000000,
+        "Orders (thousands)", [Orders] / 1000,
+        "Return rate (%)", [Return rate] * 100,
+        "Cash on delivery (%)", [COD share] * 100,
+        "Delivery time (days)", [Delivery days]
+    )</code></pre>
+        </div>
+
+        <div>
+          <h3>Automated Smart Narrative Headline</h3>
+          <p>Quantifies the exact return rate premium of Cash on Delivery orders versus prepaid card and BNPL orders.</p>
+          <pre><code>Headline =
+VAR codSh = [COD share]
+VAR retSh = [COD share of returns]
+VAR codRate = [COD return rate]
+VAR prepRate = [Prepaid return rate]
+RETURN
+    "Cash-on-delivery orders are " &amp; FORMAT ( codSh, "0%" )
+        &amp; " of orders but " &amp; FORMAT ( retSh, "0%" )
+        &amp; " of returns: they come back " &amp; FORMAT ( codRate, "0.0%" )
+        &amp; " of the time, against " &amp; FORMAT ( prepRate, "0.0%" ) &amp; " for prepaid."</code></pre>
+        </div>
+
+        <div>
+          <h3>Cash on Delivery Return Rate (%)</h3>
+          <p>Isolates return frequency specifically for orders settled via cash at the doorstep.</p>
+          <pre><code>COD return rate =
+DIVIDE (
+    SUM ( 'Sales Orders'[COD Return Count] ),
+    SUM ( 'Sales Orders'[COD Order Count] )
+)</code></pre>
+        </div>
+
+        <div>
+          <h3>Prepaid Return Rate (%)</h3>
+          <p>Measures return performance for credit card, debit card, and buy-now-pay-later digital transactions.</p>
+          <pre><code>Prepaid return rate =
+DIVIDE (
+    SUM ( 'Sales Orders'[Return Count] ) - SUM ( 'Sales Orders'[COD Return Count] ),
+    [Orders] - SUM ( 'Sales Orders'[COD Order Count] )
+)</code></pre>
+        </div>
+      </div>
     </section>
   </div>
 </main>
