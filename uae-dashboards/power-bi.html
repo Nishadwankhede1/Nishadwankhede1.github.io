@@ -67,11 +67,46 @@ h1 { font-size: 1.15rem; font-weight: 600; margin: 0 0 4px; }
 .video-container { margin: 18px 0; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
 .video-container video { display: block; width: 100%; max-height: 700px; aspect-ratio: 16/9; object-fit: contain; background: #17212b; }
 
-.lineage-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0 10px; }
-.lineage-step { border: 1px solid var(--rule); border-radius: 6px; padding: 14px; background: var(--surface); position: relative; }
-.lineage-step .step-badge { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 2px 6px; border-radius: 4px; margin-bottom: 6px; }
-.lineage-step h4 { font-size: 14px; margin: 0 0 4px; }
-.lineage-step p { font-size: 12.5px; color: var(--muted); margin: 0; line-height: 1.4; }
+/* PIPELINE DATA FLOW ANIMATION */
+.lineage-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; flex-wrap: wrap; gap: 10px; }
+.lineage-header h2 { margin: 0; font-size: 1.08rem; font-weight: 600; }
+.stream-status { display: inline-flex; align-items: center; gap: 7px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent); padding: 3px 10px; border-radius: 999px; }
+.stream-pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent); animation: pulseDot 2s infinite; }
+@keyframes pulseDot { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+.lineage-container { position: relative; margin: 16px 0 10px; }
+.flow-track { position: relative; height: 4px; background: var(--rule); border-radius: 999px; margin-bottom: 16px; overflow: hidden; }
+.flow-track-stream { position: absolute; top: 0; bottom: 0; left: -30%; width: 30%; background: linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--accent) 35%, transparent) 30%, var(--accent) 70%, #ffffff 90%, transparent 100%); border-radius: 999px; filter: drop-shadow(0 0 6px var(--accent)); animation: streamFlow 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+.flow-track-stream.delay-1 { animation: streamFlow 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite; animation-delay: 1.6s; }
+@keyframes streamFlow { 0% { left: -30%; } 100% { left: 110%; } }
+
+.lineage-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; position: relative; }
+.lineage-step { border: 1px solid var(--rule); border-radius: 8px; padding: 16px 14px; background: var(--surface); position: relative; transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; display: flex; flex-direction: column; }
+
+/* SEQUENTIAL STEP HIGHLIGHT */
+@keyframes stepCycle1 { 0%, 22% { border-color: var(--accent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 28%, transparent); transform: translateY(-3px); } 25%, 100% { border-color: var(--rule); box-shadow: none; transform: none; } }
+@keyframes stepCycle2 { 0%, 23% { border-color: var(--rule); box-shadow: none; transform: none; } 25%, 47% { border-color: var(--accent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 28%, transparent); transform: translateY(-3px); } 50%, 100% { border-color: var(--rule); box-shadow: none; transform: none; } }
+@keyframes stepCycle3 { 0%, 48% { border-color: var(--rule); box-shadow: none; transform: none; } 50%, 72% { border-color: var(--accent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 28%, transparent); transform: translateY(-3px); } 75%, 100% { border-color: var(--rule); box-shadow: none; transform: none; } }
+@keyframes stepCycle4 { 0%, 73% { border-color: var(--rule); box-shadow: none; transform: none; } 75%, 97% { border-color: var(--accent); box-shadow: 0 0 18px color-mix(in srgb, var(--accent) 28%, transparent); transform: translateY(-3px); } 100% { border-color: var(--rule); box-shadow: none; transform: none; } }
+
+.lineage-step:nth-child(1) { animation: stepCycle1 8s infinite; }
+.lineage-step:nth-child(2) { animation: stepCycle2 8s infinite; }
+.lineage-step:nth-child(3) { animation: stepCycle3 8s infinite; }
+.lineage-step:nth-child(4) { animation: stepCycle4 8s infinite; }
+
+.lineage-step:hover { animation-play-state: paused; border-color: var(--accent) !important; box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 35%, transparent) !important; transform: translateY(-4px) !important; }
+
+/* FLOW CONNECTOR ARROW */
+.lineage-step:not(:last-child)::after { content: "→"; position: absolute; right: -15px; top: 50%; transform: translateY(-50%); width: 20px; height: 20px; border-radius: 50%; background: var(--surface); border: 1px solid var(--rule); color: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; line-height: 1; z-index: 5; box-shadow: 0 2px 6px rgba(0,0,0,0.2); animation: arrowPulse 2s infinite ease-in-out; }
+@keyframes arrowPulse { 0%, 100% { border-color: var(--rule); transform: translateY(-50%) scale(0.95); } 50% { border-color: var(--accent); box-shadow: 0 0 10px color-mix(in srgb, var(--accent) 60%, transparent); transform: translateY(-50%) scale(1.1); } }
+
+.step-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.lineage-step .step-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); padding: 3px 7px; border-radius: 4px; letter-spacing: 0.5px; }
+.step-pulse-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); display: inline-block; animation: pulseDot 2s infinite; }
+.lineage-step h4 { font-size: 14.5px; margin: 0 0 5px; font-weight: 600; }
+.lineage-step p { font-size: 12.5px; color: var(--muted); margin: 0; line-height: 1.42; flex: 1; }
+.flow-meta { margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--rule); display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--muted); }
+.flow-rate { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; color: var(--accent); font-weight: 600; font-size: 10.5px; }
 
 .model { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin: 18px 0 8px; }
 .tbl { border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; background: var(--surface); }
@@ -106,7 +141,8 @@ footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top:
 
 @media (max-width: 900px) {
   .reports { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .lineage-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .lineage-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+  .lineage-step:not(:last-child)::after { display: none; }
   .model { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
 @media (max-width: 580px) {
@@ -187,29 +223,68 @@ footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top:
 
     <!-- Data Lineage -->
     <section class="section">
-      <h2>Data Lineage &amp; ETL Pipeline</h2>
-      <p>How raw point-of-sale data moves from monthly store transaction extracts into the Power BI semantic model.</p>
+      <div class="lineage-header">
+        <div>
+          <h2>Data Lineage &amp; ETL Pipeline</h2>
+          <p style="margin:4px 0 0; color:var(--muted); font-size:13.5px;">How raw point-of-sale data moves from monthly store transaction extracts into the Power BI semantic model.</p>
+        </div>
+        <div class="stream-status">
+          <span class="stream-pulse"></span>
+          <span>Live Pipeline &bull; Automated Stream</span>
+        </div>
+      </div>
       
-      <div class="lineage-grid">
-        <div class="lineage-step">
-          <span class="step-badge">1. Ingestion</span>
-          <h4>Raw Sell-Out Feeds</h4>
-          <p>Monthly POS transaction extracts from major UAE retail distributors across Hypermarkets, Supermarkets, and Groceries.</p>
+      <div class="lineage-container">
+        <div class="flow-track">
+          <div class="flow-track-stream"></div>
+          <div class="flow-track-stream delay-1"></div>
         </div>
-        <div class="lineage-step">
-          <span class="step-badge">2. Power Query (M)</span>
-          <h4>ETL &amp; Cleansing</h4>
-          <p>Handled null out-of-stock store days, unpivoted promotional vs baseline sales, enforced schema types, and removed duplicate SKU codes.</p>
-        </div>
-        <div class="lineage-step">
-          <span class="step-badge">3. Data Model</span>
-          <h4>Star Schema</h4>
-          <p>Separated transaction facts into <code>Sell Out</code>, linked 1-to-many to normalized dimensions: Channels, Categories, Emirates, and Calendar.</p>
-        </div>
-        <div class="lineage-step">
-          <span class="step-badge">4. Presentation</span>
-          <h4>Power BI Service</h4>
-          <p>Fast tabular calculations, calculation groups for dynamic metrics, and an AI Decomposition tree for root-cause driver analysis.</p>
+        
+        <div class="lineage-grid">
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 1. Ingestion</span>
+            </div>
+            <h4>Raw Sell-Out Feeds</h4>
+            <p>Monthly POS transaction extracts from major UAE retail distributors across Hypermarkets, Supermarkets, and Groceries.</p>
+            <div class="flow-meta">
+              <span>Source Cadence</span>
+              <span class="flow-rate">Monthly Extracts</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 2. Power Query (M)</span>
+            </div>
+            <h4>ETL &amp; Cleansing</h4>
+            <p>Handled null out-of-stock store days, unpivoted promotional vs baseline sales, enforced schema types, and removed duplicate SKU codes.</p>
+            <div class="flow-meta">
+              <span>Engine</span>
+              <span class="flow-rate">Mashup M Engine</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 3. Data Model</span>
+            </div>
+            <h4>Star Schema</h4>
+            <p>Separated transaction facts into <code>Sell Out</code>, linked 1-to-many to normalized dimensions: Channels, Categories, Emirates, and Calendar.</p>
+            <div class="flow-meta">
+              <span>Cardinality</span>
+              <span class="flow-rate">1 : &infin; Star Schema</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 4. Presentation</span>
+            </div>
+            <h4>Power BI Service</h4>
+            <p>Fast tabular calculations, calculation groups for dynamic metrics, and an AI Decomposition tree for root-cause driver analysis.</p>
+            <div class="flow-meta">
+              <span>Query Mode</span>
+              <span class="flow-rate">VertiPaq In-Memory</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -345,29 +420,68 @@ RETURN
 
     <!-- Data Lineage -->
     <section class="section">
-      <h2>Data Lineage &amp; ETL Pipeline</h2>
-      <p>How institutional fund accounting, custody valuation, and client registry feeds flow into the Power BI semantic model.</p>
+      <div class="lineage-header">
+        <div>
+          <h2>Data Lineage &amp; ETL Pipeline</h2>
+          <p style="margin:4px 0 0; color:var(--muted); font-size:13.5px;">How institutional fund accounting, custody valuation, and client registry feeds flow into the Power BI semantic model.</p>
+        </div>
+        <div class="stream-status">
+          <span class="stream-pulse"></span>
+          <span>Live Pipeline &bull; Automated Stream</span>
+        </div>
+      </div>
       
-      <div class="lineage-grid">
-        <div class="lineage-step">
-          <span class="step-badge">1. Ingestion</span>
-          <h4>Custody Feeds</h4>
-          <p>Monthly fund NAV snapshots, benchmark index return time series, and anonymized client register balances.</p>
+      <div class="lineage-container">
+        <div class="flow-track">
+          <div class="flow-track-stream"></div>
+          <div class="flow-track-stream delay-1"></div>
         </div>
-        <div class="lineage-step">
-          <span class="step-badge">2. Power Query (M)</span>
-          <h4>ETL &amp; Cleansing</h4>
-          <p>Harmonized dealing term categories, mapped client domicile regions, converted multi-currency AUM to USD, and enforced relationship integrity.</p>
-        </div>
-        <div class="lineage-step">
-          <span class="step-badge">3. Data Model</span>
-          <h4>Dual-Fact Schema</h4>
-          <p>Two fact tables (<code>Fund Monthly</code> &amp; <code>Clients</code>) conformed to shared <code>Funds</code> and <code>Calendar</code> dimensions, plus a dealing-term liquidity bridge.</p>
-        </div>
-        <div class="lineage-step">
-          <span class="step-badge">4. Presentation</span>
-          <h4>Power BI Service</h4>
-          <p>Asset-weighted compounded returns via PRODUCTX, benchmark excess return comparisons, and automated client withdrawal risk alerts.</p>
+        
+        <div class="lineage-grid">
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 1. Ingestion</span>
+            </div>
+            <h4>Custody Feeds</h4>
+            <p>Monthly fund NAV snapshots, benchmark index return time series, and anonymized client register balances.</p>
+            <div class="flow-meta">
+              <span>Source Cadence</span>
+              <span class="flow-rate">Monthly Custody NAVs</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 2. Power Query (M)</span>
+            </div>
+            <h4>ETL &amp; Cleansing</h4>
+            <p>Harmonized dealing term categories, mapped client domicile regions, converted multi-currency AUM to USD, and enforced relationship integrity.</p>
+            <div class="flow-meta">
+              <span>Engine</span>
+              <span class="flow-rate">Mashup M Engine</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 3. Data Model</span>
+            </div>
+            <h4>Dual-Fact Schema</h4>
+            <p>Two fact tables (<code>Fund Monthly</code> &amp; <code>Clients</code>) conformed to shared <code>Funds</code> and <code>Calendar</code> dimensions, plus a dealing-term liquidity bridge.</p>
+            <div class="flow-meta">
+              <span>Architecture</span>
+              <span class="flow-rate">Conformed Dual-Fact</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 4. Presentation</span>
+            </div>
+            <h4>Power BI Service</h4>
+            <p>Asset-weighted compounded returns via PRODUCTX, benchmark excess return comparisons, and automated client withdrawal risk alerts.</p>
+            <div class="flow-meta">
+              <span>Calculation</span>
+              <span class="flow-rate">PRODUCTX Compounded</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -499,29 +613,68 @@ COUNTROWS (
 
     <!-- Data Lineage -->
     <section class="section">
-      <h2>Data Lineage &amp; ETL Pipeline</h2>
-      <p>How Dubai freehold transaction records flow from raw registration datasets into the Power BI semantic model.</p>
+      <div class="lineage-header">
+        <div>
+          <h2>Data Lineage &amp; ETL Pipeline</h2>
+          <p style="margin:4px 0 0; color:var(--muted); font-size:13.5px;">How Dubai freehold transaction records flow from raw registration datasets into the Power BI semantic model.</p>
+        </div>
+        <div class="stream-status">
+          <span class="stream-pulse"></span>
+          <span>Live Pipeline &bull; Automated Stream</span>
+        </div>
+      </div>
       
-      <div class="lineage-grid">
-        <div class="lineage-step">
-          <span class="step-badge">1. Ingestion</span>
-          <h4>Transaction Feeds</h4>
-          <p>Sales, unit sizes, registration dates, and rental contract valuations across 8 major Dubai freehold communities.</p>
+      <div class="lineage-container">
+        <div class="flow-track">
+          <div class="flow-track-stream"></div>
+          <div class="flow-track-stream delay-1"></div>
         </div>
-        <div class="lineage-step">
-          <span class="step-badge">2. Power Query (M)</span>
-          <h4>ETL &amp; Cleansing</h4>
-          <p>Normalized community spelling, filtered non-residential outliers, derived month numbers for YoY time intelligence, and validated buyer origins.</p>
-        </div>
-        <div class="lineage-step">
-          <span class="step-badge">3. Data Model</span>
-          <h4>Star Schema</h4>
-          <p>Central <code>Sales</code> fact table linked 1-to-many with <code>Areas</code>, <code>Calendar</code>, and disconnected dynamic <code>Metric</code> parameter table.</p>
-        </div>
-        <div class="lineage-step">
-          <span class="step-badge">4. Presentation</span>
-          <h4>Power BI Service</h4>
-          <p>Dynamic metric ranking via SWITCH DAX, automated smart narrative generation, and interactive AI Decomposition Tree root-cause drill-downs.</p>
+        
+        <div class="lineage-grid">
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 1. Ingestion</span>
+            </div>
+            <h4>Transaction Feeds</h4>
+            <p>Sales, unit sizes, registration dates, and rental contract valuations across 8 major Dubai freehold communities.</p>
+            <div class="flow-meta">
+              <span>Source Cadence</span>
+              <span class="flow-rate">Daily DLD Records</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 2. Power Query (M)</span>
+            </div>
+            <h4>ETL &amp; Cleansing</h4>
+            <p>Normalized community spelling, filtered non-residential outliers, derived month numbers for YoY time intelligence, and validated buyer origins.</p>
+            <div class="flow-meta">
+              <span>Engine</span>
+              <span class="flow-rate">Mashup M Engine</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 3. Data Model</span>
+            </div>
+            <h4>Star Schema</h4>
+            <p>Central <code>Sales</code> fact table linked 1-to-many with <code>Areas</code>, <code>Calendar</code>, and disconnected dynamic <code>Metric</code> parameter table.</p>
+            <div class="flow-meta">
+              <span>Cardinality</span>
+              <span class="flow-rate">1 : &infin; Star Schema</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 4. Presentation</span>
+            </div>
+            <h4>Power BI Service</h4>
+            <p>Dynamic metric ranking via SWITCH DAX, automated smart narrative generation, and interactive AI Decomposition Tree root-cause drill-downs.</p>
+            <div class="flow-meta">
+              <span>Visuals</span>
+              <span class="flow-rate">AI Decomposition Tree</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -668,29 +821,68 @@ DIVIDE (
 
     <!-- Data Lineage -->
     <section class="section">
-      <h2>Data Lineage &amp; ETL Pipeline</h2>
-      <p>How 680K+ UAE online orders flow from checkout checkout APIs and carrier manifests into the Power BI semantic model.</p>
+      <div class="lineage-header">
+        <div>
+          <h2>Data Lineage &amp; ETL Pipeline</h2>
+          <p style="margin:4px 0 0; color:var(--muted); font-size:13.5px;">How 680K+ UAE online orders flow from checkout checkout APIs and carrier manifests into the Power BI semantic model.</p>
+        </div>
+        <div class="stream-status">
+          <span class="stream-pulse"></span>
+          <span>Live Pipeline &bull; Automated Stream</span>
+        </div>
+      </div>
       
-      <div class="lineage-grid">
-        <div class="lineage-step">
-          <span class="step-badge">1. Ingestion</span>
-          <h4>Order &amp; Carrier Logs</h4>
-          <p>Order-level transactional logs, payment gateway settlement feeds (Card, COD, BNPL), and 3PL courier transit timestamps.</p>
+      <div class="lineage-container">
+        <div class="flow-track">
+          <div class="flow-track-stream"></div>
+          <div class="flow-track-stream delay-1"></div>
         </div>
-        <div class="lineage-step">
-          <span class="step-badge">2. Power Query (M)</span>
-          <h4>ETL &amp; Cleansing</h4>
-          <p>Calculated transit days between dispatch and customer handover, mapped COD handling fees, standardizes 7 emirates, and parsed return reasons.</p>
-        </div>
-        <div class="lineage-step">
-          <span class="step-badge">3. Data Model</span>
-          <h4>Star Schema</h4>
-          <p>Central <code>Sales Orders</code> fact linked 1-to-many with <code>Emirates</code>, <code>Categories</code>, <code>Channels</code>, <code>Payments</code>, and <code>Calendar</code>.</p>
-        </div>
-        <div class="lineage-step">
-          <span class="step-badge">4. Presentation</span>
-          <h4>Power BI Service</h4>
-          <p>Dynamic metric ranking via SWITCH DAX, automated smart narrative generation, and interactive AI Decomposition Tree root-cause drill-downs.</p>
+        
+        <div class="lineage-grid">
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 1. Ingestion</span>
+            </div>
+            <h4>Order &amp; Carrier Logs</h4>
+            <p>Order-level transactional logs, payment gateway settlement feeds (Card, COD, BNPL), and 3PL courier transit timestamps.</p>
+            <div class="flow-meta">
+              <span>Source Cadence</span>
+              <span class="flow-rate">Transactional APIs</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 2. Power Query (M)</span>
+            </div>
+            <h4>ETL &amp; Cleansing</h4>
+            <p>Calculated transit days between dispatch and customer handover, mapped COD handling fees, standardizes 7 emirates, and parsed return reasons.</p>
+            <div class="flow-meta">
+              <span>Engine</span>
+              <span class="flow-rate">Mashup M Engine</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 3. Data Model</span>
+            </div>
+            <h4>Star Schema</h4>
+            <p>Central <code>Sales Orders</code> fact linked 1-to-many with <code>Emirates</code>, <code>Categories</code>, <code>Channels</code>, <code>Payments</code>, and <code>Calendar</code>.</p>
+            <div class="flow-meta">
+              <span>Cardinality</span>
+              <span class="flow-rate">1 : &infin; Star Schema</span>
+            </div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top">
+              <span class="step-badge"><span class="step-pulse-dot"></span> 4. Presentation</span>
+            </div>
+            <h4>Power BI Service</h4>
+            <p>Dynamic metric ranking via SWITCH DAX, automated smart narrative generation, and interactive AI Decomposition Tree root-cause drill-downs.</p>
+            <div class="flow-meta">
+              <span>Analytics</span>
+              <span class="flow-rate">Real-Time VertiPaq</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
