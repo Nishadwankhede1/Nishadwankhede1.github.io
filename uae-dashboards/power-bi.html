@@ -150,7 +150,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top:
     </article>
 
     <article class="rep" id="card-property" onclick="showReport('property')" style="--c:#1f6f9b">
-      <p class="ind">Real Estate</p>
+      <p class="ind">Real Estate &middot; Live Video</p>
       <h3>Property Pulse</h3>
       <p>Dubai sales, price per sq ft, rental yield, off-plan share with metric picker and AI breakdown page.</p>
       <div class="links">
@@ -383,9 +383,169 @@ RETURN
   <!-- VIEW 3: PROPERTY PULSE -->
   <div id="view-property" class="detail-view">
     <section class="section">
-      <h2>Property Pulse &mdash; Dubai Real Estate</h2>
-      <p>Dubai residential property intelligence across eight key freehold communities: price per sq ft, rental yields, and off-plan sales volume.</p>
-      <p><a href="real-estate.html" class="button" style="display:inline-block; margin-top:8px;">Open Interactive Real Estate Dashboard &rarr;</a></p>
+      <h2>Property Pulse &mdash; Report Walkthrough</h2>
+      <p>Refined executive walkthrough of the live <strong>Dubai Property Pulse</strong> report running in Power BI Service. Watch the real-time community cross-filtering, dynamic calculation group ranking, and AI Decomposition Tree.</p>
+      <p style="margin: 0 0 12px;"><span style="display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600; color:var(--accent); background:color-mix(in srgb, var(--accent) 12%, transparent); padding:4px 12px; border-radius:999px;">🎧 Includes audio walkthrough &mdash; press Play to listen</span></p>
+      
+      <div class="video-container">
+        <video controls playsinline poster="power-bi/property-pulse-poster.png">
+          <source src="power-bi/property-pulse-demo.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div style="margin-top:16px;">
+        <a href="real-estate.html" class="button" style="display:inline-flex; align-items:center; gap:6px;">Launch Interactive Web Dashboard &rarr;</a>
+      </div>
+    </section>
+
+    <!-- Data Lineage -->
+    <section class="section">
+      <h2>Data Lineage &amp; ETL Pipeline</h2>
+      <p>How Dubai freehold transaction records flow from raw registration datasets into the Power BI semantic model.</p>
+      
+      <div class="lineage-grid">
+        <div class="lineage-step">
+          <span class="step-badge">1. Ingestion</span>
+          <h4>Transaction Feeds</h4>
+          <p>Sales, unit sizes, registration dates, and rental contract valuations across 8 major Dubai freehold communities.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">2. Power Query (M)</span>
+          <h4>ETL &amp; Cleansing</h4>
+          <p>Normalized community spelling, filtered non-residential outliers, derived month numbers for YoY time intelligence, and validated buyer origins.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">3. Data Model</span>
+          <h4>Star Schema</h4>
+          <p>Central <code>Sales</code> fact table linked 1-to-many with <code>Areas</code>, <code>Calendar</code>, and disconnected dynamic <code>Metric</code> parameter table.</p>
+        </div>
+        <div class="lineage-step">
+          <span class="step-badge">4. Presentation</span>
+          <h4>Power BI Service</h4>
+          <p>Dynamic metric ranking via SWITCH DAX, automated smart narrative generation, and interactive AI Decomposition Tree root-cause drill-downs.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Star Schema Model -->
+    <section class="section">
+      <h2>Inside the Property Pulse Star Schema</h2>
+      <p>A high-performance star schema optimized for multi-community comparisons, buyer demographics, and AI decomposition without circular dependencies.</p>
+      <div class="model">
+        <div class="tbl fact">
+          <h3>Sales</h3>
+          <p class="kind">Central Fact Table</p>
+          <ul>
+            <li>Price AED</li>
+            <li>Size SqFt</li>
+            <li>Gross Yield</li>
+            <li>Status (Off-plan / Ready)</li>
+            <li>Buyer Region</li>
+            <li>Property Type</li>
+            <li>Date</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Areas</h3>
+          <p class="kind">Dimension (8 rows)</p>
+          <ul>
+            <li>Downtown Dubai</li>
+            <li>Palm Jumeirah</li>
+            <li>Dubai Hills Estate</li>
+            <li>Dubai Marina</li>
+            <li>Business Bay</li>
+            <li>Arabian Ranches</li>
+            <li>Jumeirah Village Circle</li>
+            <li>Dubai South</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Calendar</h3>
+          <p class="kind">Dimension (33 months)</p>
+          <ul>
+            <li>Date</li>
+            <li>Year</li>
+            <li>Month</li>
+            <li>Month Number</li>
+          </ul>
+        </div>
+        <div class="tbl">
+          <h3>Metric</h3>
+          <p class="kind">Parameter Bridge</p>
+          <ul>
+            <li>Sales value (AED M)</li>
+            <li>Transactions</li>
+            <li>Price per sq ft (AED)</li>
+            <li>Gross yield (%)</li>
+            <li>Off-plan share (%)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- DAX Measures -->
+    <section class="section">
+      <h2>Core Property Pulse DAX Measures</h2>
+      <p>Custom analytical logic built into the Power BI tabular model powering dynamic sorting, smart narratives, and yield analytics.</p>
+      
+      <div class="dax">
+        <div>
+          <h3>Dynamic Metric Selector (Calculation Parameter)</h3>
+          <p>Dynamically swaps the visual measure in the community ranking chart based on user slicer selection.</p>
+          <pre><code>Selected metric =
+VAR pick = SELECTEDVALUE ( Metric[Metric], "Sales value (AED M)" )
+RETURN
+    SWITCH (
+        pick,
+        "Sales value (AED M)", [Sales value] / 1000000,
+        "Transactions", [Transactions],
+        "Price per sq ft (AED)", [Price per sq ft],
+        "Gross yield (%)", [Average gross yield] * 100,
+        "Off-plan share (%)", [Off-plan share] * 100
+    )</code></pre>
+        </div>
+
+        <div>
+          <h3>Automated Smart Narrative Headline</h3>
+          <p>Evaluates community yield outliers and automatically generates dynamic English insights above the KPIs.</p>
+          <pre><code>Headline =
+VAR t = ADDCOLUMNS ( VALUES ( Areas[Area] ), "@y", [Average gross yield], "@n", [Transactions] )
+VAR valid = FILTER ( t, [@n] >= 10 )
+VAR n = COUNTROWS ( valid )
+VAR hi = TOPN ( 1, valid, [@y], DESC )
+VAR lo = TOPN ( 1, valid, [@y], ASC )
+VAR hiName = MAXX ( hi, Areas[Area] )
+VAR hiY = MAXX ( hi, [@y] )
+VAR loName = MAXX ( lo, Areas[Area] )
+VAR loY = MAXX ( lo, [@y] )
+RETURN
+    SWITCH (
+        TRUE (),
+        n = 0, "Not enough sales in this selection to compare communities.",
+        n = 1, hiName &amp; " sold at AED " &amp; FORMAT ( [Price per sq ft], "#,0" ) &amp; " per sq ft with a " &amp; FORMAT ( hiY, "0.0%" ) &amp; " gross yield.",
+        hiName &amp; " pays the most rent for the price at a " &amp; FORMAT ( hiY, "0.0%" ) &amp; " gross yield, "
+            &amp; FORMAT ( ( hiY - loY ) * 100, "0.0" ) &amp; " points above " &amp; loName &amp; "."
+    )</code></pre>
+        </div>
+
+        <div>
+          <h3>Average Price Per Square Foot</h3>
+          <p>Measures capital density across transactions, avoiding distorted averages by computing weighted unit price over total aggregate square footage.</p>
+          <pre><code>Price per sq ft =
+DIVIDE ( SUM ( Sales[Price AED] ), SUM ( Sales[Size SqFt] ) )</code></pre>
+        </div>
+
+        <div>
+          <h3>Off-Plan Market Share (%)</h3>
+          <p>Calculates the proportion of off-plan development transactions relative to total residential deal volume.</p>
+          <pre><code>Off-plan share =
+DIVIDE (
+    CALCULATE ( COUNTROWS ( Sales ), Sales[Status] = "Off-plan" ),
+    COUNTROWS ( Sales )
+)</code></pre>
+        </div>
+      </div>
     </section>
   </div>
 
