@@ -1,0 +1,888 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DIFC fund house: assets, flows and clients | Nishad Wankhede</title>
+<meta name="description" content="Interactive asset management dashboard for a DIFC fund house: AUM, net flows, performance against benchmark, client mix and liquidity.">
+<meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11161b" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #fafaf7; --surface: #ffffff; --ink: #17212b; --muted: #5a6570; --rule: #e1e3de; --accent: #0f6b5c; --focus: #3d5a80;
+  --s1: #0f6b5c; --s2: #b5862c; --s3: #3d5a80; --s4: #9a4f6b; --s5: #6f8f5f; --s6: #7a8794; --s7: #2f8fa3; --s8: #5a5f99;
+  --s1-soft: #b8d5ce; --grey: #b9bfc5; --pos: #0f6b5c; --neg: #b4473d;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #11161b; --surface: #171d23; --ink: #e6e9eb; --muted: #9aa4ad; --rule: #29323b; --accent: #43b49a; --focus: #86a5cf;
+    --s1: #43b49a; --s2: #d8b35c; --s3: #86a5cf; --s4: #cf87a5; --s5: #9cbd88; --s6: #9aa6b2; --s7: #62bfd2; --s8: #9da1e2;
+    --s1-soft: #2a4d45; --grey: #4d5761; --pos: #43b49a; --neg: #e57c70;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.55 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; font-variant-numeric: tabular-nums; }
+a { color: inherit; text-underline-offset: 3px; }
+a:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 3px; }
+.top { max-width: 1180px; margin: 0 auto; padding: 18px 24px; display: flex; gap: 24px; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--rule); }
+.home { font-weight: 600; text-decoration: none; white-space: nowrap; }
+.top nav { display: flex; gap: 20px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; min-width: 0; max-width: 100%; }
+.top nav a { text-decoration: none; color: var(--muted); padding-bottom: 4px; border-bottom: 2px solid transparent; }
+.top nav a:hover { color: var(--ink); }
+.top nav a[aria-current="page"] { color: var(--ink); border-color: var(--accent); }
+main { max-width: 1180px; margin: 0 auto; padding: 30px 24px 56px; }
+h1 { font-size: 1.05rem; font-weight: 600; margin: 0 0 4px; }
+.lede { color: var(--muted); margin: 0 0 22px; max-width: 72ch; }
+.filters { display: flex; flex-wrap: wrap; gap: 12px 16px; align-items: end; padding: 14px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 160px; }
+.field label { font-size: 12.5px; color: var(--muted); }
+select { font: inherit; font-size: 14px; color: var(--ink); background-color: var(--surface); border: 1px solid var(--rule); border-radius: 6px; padding: 7px 32px 7px 10px; appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 16px) 55%, calc(100% - 11px) 55%; background-size: 5px 5px; background-repeat: no-repeat; }
+select:hover { border-color: var(--muted); }
+.reset { font: inherit; font-size: 13.5px; background: none; border: 0; color: var(--muted); text-decoration: underline; text-underline-offset: 3px; padding: 8px 2px; cursor: pointer; margin-left: auto; }
+.reset:hover { color: var(--ink); }
+.finding { padding: 34px 0 30px; max-width: 920px; }
+#finding { font-family: 'Newsreader', 'Iowan Old Style', Georgia, 'Times New Roman', serif; font-size: clamp(1.45rem, 1.05rem + 1.55vw, 2.3rem); line-height: 1.24; letter-spacing: -0.008em; font-weight: 400; margin: 0 0 18px; text-wrap: pretty; }
+#notes { list-style: none; margin: 0; padding: 0 0 0 16px; border-left: 2px solid var(--accent); display: grid; gap: 6px; max-width: 74ch; }
+.finding.flash #finding, .finding.flash #notes { animation: settle .5s ease-out; }
+@keyframes settle { from { opacity: .2; } to { opacity: 1; } }
+.kpis { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 1px; background: var(--rule); border-top: 1.5px solid var(--ink); border-bottom: 1px solid var(--rule); margin-bottom: 30px; }
+.kpi { background: var(--bg); padding: 14px 16px 14px 0; }
+.kpi p { margin: 0; }
+.kpi .label { font-size: 13px; color: var(--muted); }
+.kpi .value { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.015em; margin: 2px 0; white-space: nowrap; }
+.kpi .note { font-size: 12.5px; color: var(--muted); }
+.kpi .note.pos { color: var(--pos); } .kpi .note.neg { color: var(--neg); }
+.grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 34px 40px; }
+.panel { min-width: 0; border-top: 1px solid var(--rule); padding-top: 14px; }
+.panel.wide { grid-column: 1 / -1; }
+.panel h3, .table-block h2 { font-size: 1rem; font-weight: 600; margin: 0; }
+.panel .sub, .table-block .sub { font-size: 13px; color: var(--muted); margin: 2px 0 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--muted); margin-bottom: 8px; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.legend i.line { width: 14px; height: 3px; vertical-align: 3px; }
+.plot { position: relative; width: 100%; }
+.plot svg { display: block; overflow: visible; touch-action: pan-y; font-family: inherit; user-select: none; -webkit-user-select: none; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--bg); border-radius: 6px; padding: 8px 10px; font-size: 12.5px; line-height: 1.45; min-width: 160px; max-width: 270px; z-index: 3; box-shadow: 0 6px 18px rgba(0, 0, 0, .18); }
+.tip strong { display: block; font-weight: 600; margin-bottom: 3px; }
+.tip .row { display: flex; align-items: center; gap: 6px; }
+.tip .row b { margin-left: auto; padding-left: 14px; font-weight: 600; }
+.tip i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; flex: none; }
+.tip .extra { display: block; opacity: .78; margin-top: 2px; }
+.table-block { margin-top: 44px; border-top: 1.5px solid var(--ink); padding-top: 14px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 680px; }
+th { font-weight: 500; color: var(--muted); font-size: 12.5px; text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+td { padding: 9px 14px 9px 0; border-bottom: 1px solid var(--rule); }
+th:last-child, td:last-child { padding-right: 0; }
+.num { text-align: right; white-space: nowrap; }
+td.pos { color: var(--pos); } td.neg { color: var(--neg); }
+td.empty { color: var(--muted); padding: 18px 0; }
+footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top: 1px solid var(--rule); color: var(--muted); font-size: 13.5px; }
+footer p { margin: 0 0 6px; max-width: 82ch; }
+@media (max-width: 860px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .top { flex-direction: column; align-items: stretch; gap: 10px; }
+  .reset { margin-left: 0; }
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .kpi:nth-child(even) { padding-left: 14px; }
+  .kpi:last-child:nth-child(odd) { grid-column: 1 / -1; }
+}
+@media (max-width: 540px) {
+  main { padding: 22px 16px 40px; } .top, footer { padding-left: 16px; padding-right: 16px; }
+  .field { min-width: calc(50% - 8px); flex: 1; }
+  .kpi { padding-right: 10px; }
+  .kpi .value { font-size: 1.3rem; }
+}
+@media (prefers-reduced-motion: reduce) { .finding.flash #finding, .finding.flash #notes { animation: none; } }
+
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.ask-inline { margin-top: 16px; font: inherit; font-size: 14px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; text-decoration: underline; text-underline-offset: 4px; }
+.ask-fab { position: fixed; right: 20px; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 20; display: flex; align-items: center; gap: 8px; background: var(--ink); color: var(--bg); border: 0; border-radius: 999px; padding: 12px 18px; font: inherit; font-size: 14px; font-weight: 600; box-shadow: 0 12px 30px -12px rgba(0, 0, 0, .45); cursor: pointer; }
+.ask-fab:hover { opacity: .92; }
+.chat-open .ask-fab { display: none; }
+.chat { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100vw); z-index: 30; background: var(--surface); border-left: 1px solid var(--rule); display: flex; flex-direction: column; transform: translateX(100%); transition: transform .2s ease; box-shadow: -24px 0 48px -36px rgba(0, 0, 0, .5); }
+.chat.on { transform: none; }
+.chat-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: calc(16px + env(safe-area-inset-top, 0px)) 18px 12px; border-bottom: 1px solid var(--rule); }
+.chat-head h2 { font-size: 1rem; margin: 0; }
+.chat-head p { margin: 2px 0 0; font-size: 12.5px; color: var(--muted); }
+.chat-x { border: 0; background: none; color: var(--muted); cursor: pointer; padding: 4px; border-radius: 6px; }
+.chat-x:hover { color: var(--ink); }
+.chat-log { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; overscroll-behavior: contain; }
+.msg { max-width: 92%; border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.5; }
+.msg p { margin: 0; }
+.msg.me { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+.msg.bot { align-self: flex-start; background: var(--bg); border: 1px solid var(--rule); border-bottom-left-radius: 4px; }
+.bars { margin-top: 10px; display: grid; gap: 6px; }
+.bar { display: grid; grid-template-columns: 104px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: 12.5px; }
+.bl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+.bt { height: 8px; background: var(--rule); border-radius: 4px; overflow: hidden; }
+.bt i { display: block; height: 100%; background: var(--accent); border-radius: 4px; }
+.bv { font-weight: 600; font-variant-numeric: tabular-nums; }
+.twrap { overflow-x: auto; margin-top: 10px; }
+.msg table { border-collapse: collapse; font-size: 12.5px; min-width: 100%; }
+.msg th, .msg td { padding: 5px 10px 5px 0; border-bottom: 1px solid var(--rule); text-align: left; white-space: nowrap; font-weight: 400; }
+.msg tr:first-child th { font-weight: 600; }
+.msg td { font-variant-numeric: tabular-nums; }
+.spark { display: block; width: 100%; height: 56px; color: var(--accent); margin-top: 10px; }
+.sparkcap { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); }
+.acts, .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.act, .chip { font: inherit; font-size: 12.5px; line-height: 1.35; border-radius: 999px; padding: 6px 11px; cursor: pointer; border: 1px solid var(--rule); background: var(--surface); color: var(--ink); text-align: left; }
+.act { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.act:hover, .chip:hover { border-color: var(--ink); }
+.typing { display: flex; gap: 4px; padding: 14px; }
+.typing span { width: 6px; height: 6px; border-radius: 50%; background: var(--muted); animation: blink 1s infinite; }
+.typing span:nth-child(2) { animation-delay: .15s; } .typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+.chat-form { display: flex; gap: 8px; padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--rule); }
+.chat-form input { flex: 1; min-width: 0; font: inherit; font-size: 15px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 10px; background: var(--bg); color: var(--ink); }
+.chat-form input:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.chat-form button { border: 0; border-radius: 10px; background: var(--accent); color: #fff; padding: 0 14px; cursor: pointer; display: flex; align-items: center; }
+@media (min-width: 1100px) { body.chat-open { padding-right: 420px; } }
+@media (prefers-reduced-motion: reduce) { .chat { transition: none; } .typing span { animation: none; } }
+
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="home" href="../">Nishad Wankhede</a>
+  <nav aria-label="Dashboards"><a href="./">All dashboards</a><a href="real-estate.html">Real estate</a><a href="ecommerce.html">E-commerce</a><a href="asset-management.html" aria-current="page">Asset management</a><a href="logistics.html">Logistics</a><a href="power-bi.html">Power BI</a></nav>
+</header>
+<main>
+  <h1>DIFC fund house: assets, flows and clients</h1>
+  <p class="lede">Five synthetic funds run from Dubai International Financial Centre, and the clients behind them. Built for a COO or head of distribution who needs to see where money is coming from and who might leave. <a href="power-bi.html">See the Power BI version</a>.</p>
+  <div class="filters" id="filters" role="group" aria-label="Filters"></div>
+  <section class="finding" aria-live="polite" aria-label="What the data shows">
+    <p id="finding"></p>
+    <ul id="notes"></ul>
+  </section>
+  <section class="kpis" id="kpis" aria-label="Key figures"></section>
+  <div class="grid" id="charts"></div>
+  <section class="table-block">
+    <h2>Clients to call this week</h2>
+    <p class="sub" id="table-sub"></p>
+    <div class="table-wrap"><table id="table"></table></div>
+  </section>
+</main>
+<footer>
+  <p>All figures are synthetic. They were generated in Python to follow the shape of the UAE market, including seasonal patterns, and are not taken from any real company or government source.</p>
+  <p>Download <a href="data/fund_monthly.csv">the fund data (CSV)</a> and <a href="data/fund_investors.csv">the client holdings (CSV)</a> to rebuild this in Power BI. <a href="./">See all four dashboards</a>.</p>
+</footer>
+
+<script>window.DASH_DATA = {"m":{"cols":["month","fund","start","flow","ret","bench","end"],"rows":[["2024-01","Global Equity",820,-1.25,1.723,0.931,832.88],["2024-02","Global Equity",832.88,9.2,10.493,9.564,929.47],["2024-03","Global Equity",929.47,-10.43,0.229,0.059,921.16],["2024-04","Global Equity",921.16,-10.15,8.532,7.954,989.6],["2024-05","Global Equity",989.6,-3.54,0.078,1.463,986.84],["2024-06","Global Equity",986.84,3.89,1.162,1.07,1002.19],["2024-07","Global Equity",1002.19,-7.98,1.271,1.813,1006.95],["2024-08","Global Equity",1006.95,-2.78,1.441,1.599,1018.68],["2024-09","Global Equity",1018.68,5.94,3.115,2.254,1056.36],["2024-10","Global Equity",1056.36,-1.99,-2.085,-1.611,1032.35],["2024-11","Global Equity",1032.35,-15.93,1.8,1.406,1035.0],["2024-12","Global Equity",1035.0,-6.97,4.638,4.701,1076.03],["2025-01","Global Equity",1076.03,1.99,-3.233,-3.004,1043.23],["2025-02","Global Equity",1043.23,-4.46,8.737,8.995,1129.93],["2025-03","Global Equity",1129.93,2.29,3.361,2.965,1170.2],["2025-04","Global Equity",1170.2,1.66,3.525,2.893,1213.1],["2025-05","Global Equity",1213.1,20.42,0.746,0.636,1242.57],["2025-06","Global Equity",1242.57,-10.95,-3.028,-2.183,1193.99],["2025-07","Global Equity",1193.99,2.18,-0.173,0.606,1194.11],["2025-08","Global Equity",1194.11,-15.99,1.535,0.302,1196.45],["2025-09","Global Equity",1196.45,9.67,1.643,1.968,1225.78],["2025-10","Global Equity",1225.78,10.44,4.227,4.666,1288.03],["2025-11","Global Equity",1288.03,9.97,1.655,2.329,1319.32],["2025-12","Global Equity",1319.32,18.03,5.888,5.372,1415.04],["2026-01","Global Equity",1415.04,16.14,4.559,4.514,1495.69],["2026-02","Global Equity",1495.69,14.17,-0.171,-0.913,1507.3],["2026-03","Global Equity",1507.3,0.09,0.562,1.47,1515.85],["2026-04","Global Equity",1515.85,1.95,3.046,3.366,1563.98],["2026-05","Global Equity",1563.98,6.59,4.351,3.735,1638.62],["2026-06","Global Equity",1638.62,-6.47,-2.432,-2.272,1592.3],["2026-07","Global Equity",1592.3,9.29,-1.073,-0.425,1584.51],["2026-08","Global Equity",1584.51,-1.97,8.048,9.121,1710.06],["2026-09","Global Equity",1710.06,-18.91,1.571,2.559,1718.02],["2024-01","MENA Equity",410,11.01,1.921,1.853,428.88],["2024-02","MENA Equity",428.88,-3.09,1.09,2.003,430.47],["2024-03","MENA Equity",430.47,2.07,2.098,2.92,441.57],["2024-04","MENA Equity",441.57,11.6,2.207,1.583,462.91],["2024-05","MENA Equity",462.91,-3.11,-4.498,-4.239,438.98],["2024-06","MENA Equity",438.98,0.3,4.333,4.578,458.3],["2024-07","MENA Equity",458.3,10.72,-2.998,-2.799,455.29],["2024-08","MENA Equity",455.29,5.13,6.656,4.918,490.72],["2024-09","MENA Equity",490.72,-9.0,1.719,2.084,490.15],["2024-10","MENA Equity",490.15,5.31,-0.208,-0.879,494.44],["2024-11","MENA Equity",494.44,0.23,-4.679,-6.22,471.55],["2024-12","MENA Equity",471.55,7.47,-1.885,-2.584,470.12],["2025-01","MENA Equity",470.12,-5.42,4.766,4.208,487.11],["2025-02","MENA Equity",487.11,11.61,0.552,0.591,501.41],["2025-03","MENA Equity",501.41,7.34,-2.97,-2.872,493.86],["2025-04","MENA Equity",493.86,7.61,-2.611,-3.154,488.57],["2025-05","MENA Equity",488.57,17.03,5.452,5.76,532.24],["2025-06","MENA Equity",532.24,3.5,2.698,3.332,550.1],["2025-07","MENA Equity",550.1,-4.74,3.16,3.044,562.75],["2025-08","MENA Equity",562.75,5.49,4.773,3.884,595.1],["2025-09","MENA Equity",595.1,-0.05,4.295,3.977,620.61],["2025-10","MENA Equity",620.61,7.97,-0.691,-0.256,624.29],["2025-11","MENA Equity",624.29,14.45,-0.569,1.099,635.19],["2025-12","MENA Equity",635.19,18.01,3.33,1.596,674.35],["2026-01","MENA Equity",674.35,8.98,10.243,9.122,752.4],["2026-02","MENA Equity",752.4,15.38,-3.016,-2.442,745.09],["2026-03","MENA Equity",745.09,4.7,-0.97,-0.072,742.57],["2026-04","MENA Equity",742.57,-4.74,-0.048,-0.613,737.48],["2026-05","MENA Equity",737.48,7.66,1.136,1.296,753.52],["2026-06","MENA Equity",753.52,16.48,1.317,0.292,779.92],["2026-07","MENA Equity",779.92,6.62,0.544,0.849,790.79],["2026-08","MENA Equity",790.79,4.74,0.432,0.349,798.95],["2026-09","MENA Equity",798.95,-0.58,1.543,1.912,810.7],["2024-01","Sukuk & Fixed Income",960,-4.0,-1.029,-0.877,946.12],["2024-02","Sukuk & Fixed Income",946.12,-0.77,-1.074,-0.836,935.18],["2024-03","Sukuk & Fixed Income",935.18,2.91,2.446,2.24,960.97],["2024-04","Sukuk & Fixed Income",960.97,-9.03,0.75,0.523,959.15],["2024-05","Sukuk & Fixed Income",959.15,15.46,1.874,2.032,992.58],["2024-06","Sukuk & Fixed Income",992.58,-11.31,-0.178,-0.139,979.5],["2024-07","Sukuk & Fixed Income",979.5,-1.4,0.679,0.403,984.75],["2024-08","Sukuk & Fixed Income",984.75,8.19,0.808,1.112,1000.9],["2024-09","Sukuk & Fixed Income",1000.9,15.38,0.76,0.617,1023.89],["2024-10","Sukuk & Fixed Income",1023.89,4.91,1.501,1.024,1044.16],["2024-11","Sukuk & Fixed Income",1044.16,10.36,-0.331,-0.396,1051.06],["2024-12","Sukuk & Fixed Income",1051.06,14.55,0.314,0.539,1068.91],["2025-01","Sukuk & Fixed Income",1068.91,0.17,0.29,-0.054,1072.18],["2025-02","Sukuk & Fixed Income",1072.18,12.39,1.584,1.312,1101.55],["2025-03","Sukuk & Fixed Income",1101.55,9.89,0.673,0.805,1118.86],["2025-04","Sukuk & Fixed Income",1118.86,9.12,0.591,0.903,1134.59],["2025-05","Sukuk & Fixed Income",1134.59,3.72,0.489,0.245,1143.85],["2025-06","Sukuk & Fixed Income",1143.85,-4.4,0.909,0.56,1149.85],["2025-07","Sukuk & Fixed Income",1149.85,-3.49,0.199,0.087,1148.65],["2025-08","Sukuk & Fixed Income",1148.65,-2.23,0.396,0.437,1150.97],["2025-09","Sukuk & Fixed Income",1150.97,9.93,1.101,0.841,1173.57],["2025-10","Sukuk & Fixed Income",1173.57,-12.38,1.175,0.891,1174.98],["2025-11","Sukuk & Fixed Income",1174.98,9.89,1.02,1.117,1196.85],["2025-12","Sukuk & Fixed Income",1196.85,17.61,-1.592,-1.573,1195.41],["2026-01","Sukuk & Fixed Income",1195.41,8.34,0.169,0.079,1205.76],["2026-02","Sukuk & Fixed Income",1205.76,12.5,1.17,1.23,1232.37],["2026-03","Sukuk & Fixed Income",1232.37,-6.11,-0.077,0.035,1225.31],["2026-04","Sukuk & Fixed Income",1225.31,4.39,0.374,0.541,1234.28],["2026-05","Sukuk & Fixed Income",1234.28,5.32,-0.628,-0.676,1231.85],["2026-06","Sukuk & Fixed Income",1231.85,7.36,0.897,0.827,1250.26],["2026-07","Sukuk & Fixed Income",1250.26,-6.02,0.585,0.398,1251.56],["2026-08","Sukuk & Fixed Income",1251.56,16.71,1.412,0.858,1285.94],["2026-09","Sukuk & Fixed Income",1285.94,0.55,1.029,0.992,1299.72],["2024-01","Multi-Asset Balanced",640,9.69,-1.322,-0.816,641.24],["2024-02","Multi-Asset Balanced",641.24,-1.37,3.505,3.472,662.34],["2024-03","Multi-Asset Balanced",662.34,-5.92,1.604,2.06,667.04],["2024-04","Multi-Asset Balanced",667.04,5.53,2.095,2.683,686.54],["2024-05","Multi-Asset Balanced",686.54,0.09,-0.807,-1.099,681.09],["2024-06","Multi-Asset Balanced",681.09,2.4,-3.905,-3.672,656.89],["2024-07","Multi-Asset Balanced",656.89,-13.45,1.776,0.984,655.11],["2024-08","Multi-Asset Balanced",655.11,-5.89,-1.964,-2.485,636.35],["2024-09","Multi-Asset Balanced",636.35,4.62,0.593,1.107,644.75],["2024-10","Multi-Asset Balanced",644.75,8.57,-1.395,-1.038,644.32],["2024-11","Multi-Asset Balanced",644.32,8.74,2.77,2.653,670.9],["2024-12","Multi-Asset Balanced",670.9,-0.12,1.994,1.981,684.17],["2025-01","Multi-Asset Balanced",684.17,-0.81,0.701,0.827,688.15],["2025-02","Multi-Asset Balanced",688.15,-0.83,-4.376,-4.402,657.21],["2025-03","Multi-Asset Balanced",657.21,12.93,-1.743,-2.515,658.69],["2025-04","Multi-Asset Balanced",658.69,-3.9,0.788,0.442,659.99],["2025-05","Multi-Asset Balanced",659.99,-11.51,3.812,3.943,673.64],["2025-06","Multi-Asset Balanced",673.64,5.26,0.086,0.106,679.48],["2025-07","Multi-Asset Balanced",679.48,7.68,3.408,3.355,710.32],["2025-08","Multi-Asset Balanced",710.32,-3.08,-0.688,-0.765,702.35],["2025-09","Multi-Asset Balanced",702.35,10.65,0.915,0.838,719.42],["2025-10","Multi-Asset Balanced",719.42,1.76,-1.492,-1.186,710.45],["2025-11","Multi-Asset Balanced",710.45,-16.5,-0.761,-0.808,688.54],["2025-12","Multi-Asset Balanced",688.54,3.41,0.221,0.541,693.48],["2026-01","Multi-Asset Balanced",693.48,-6.3,-1.472,-1.596,676.97],["2026-02","Multi-Asset Balanced",676.97,-9.58,1.903,1.112,680.27],["2026-03","Multi-Asset Balanced",680.27,-6.13,-1.559,-1.589,663.53],["2026-04","Multi-Asset Balanced",663.53,3.21,2.291,2.513,681.94],["2026-05","Multi-Asset Balanced",681.94,-4.5,-0.505,-0.088,673.99],["2026-06","Multi-Asset Balanced",673.99,14.16,0.669,0.601,692.66],["2026-07","Multi-Asset Balanced",692.66,2.19,-1.12,-1.249,687.1],["2026-08","Multi-Asset Balanced",687.1,-22.71,1.536,1.612,674.94],["2026-09","Multi-Asset Balanced",674.94,-2.82,-1.437,-1.73,662.42],["2024-01","Private Credit",300,3.01,0.713,0.795,305.15],["2024-02","Private Credit",305.15,2.23,0.202,0.065,307.99],["2024-03","Private Credit",307.99,10.44,0.147,0.12,318.88],["2024-04","Private Credit",318.88,12.05,0.491,0.263,332.5],["2024-05","Private Credit",332.5,10.38,0.665,0.441,345.09],["2024-06","Private Credit",345.09,8.18,0.051,-0.162,353.45],["2024-07","Private Credit",353.45,10.79,0.888,0.829,367.38],["2024-08","Private Credit",367.38,15.52,1.575,1.398,388.68],["2024-09","Private Credit",388.68,3.05,0.76,0.421,394.69],["2024-10","Private Credit",394.69,-0.02,0.599,0.54,397.03],["2024-11","Private Credit",397.03,14.24,0.918,0.569,414.92],["2024-12","Private Credit",414.92,14.55,0.54,0.407,431.72],["2025-01","Private Credit",431.72,11.99,0.753,0.608,446.96],["2025-02","Private Credit",446.96,13.53,1.038,0.517,465.13],["2025-03","Private Credit",465.13,7.63,1.686,1.021,480.6],["2025-04","Private Credit",480.6,12.56,0.016,-0.258,493.24],["2025-05","Private Credit",493.24,16.79,0.972,0.588,514.82],["2025-06","Private Credit",514.82,15.1,1.195,1.059,536.07],["2025-07","Private Credit",536.07,8.02,0.622,0.382,547.43],["2025-08","Private Credit",547.43,10.91,1.112,0.603,564.43],["2025-09","Private Credit",564.43,11.2,-0.134,-0.254,574.87],["2025-10","Private Credit",574.87,14.38,-0.047,-0.334,588.99],["2025-11","Private Credit",588.99,8.71,0.327,0.619,599.63],["2025-12","Private Credit",599.63,20.55,0.939,0.542,625.8],["2026-01","Private Credit",625.8,14.04,0.484,0.428,642.87],["2026-02","Private Credit",642.87,19.16,1.411,0.96,671.1],["2026-03","Private Credit",671.1,16.57,1.007,0.585,694.44],["2026-04","Private Credit",694.44,10.13,0.421,0.261,707.49],["2026-05","Private Credit",707.49,15.81,0.201,0.156,724.72],["2026-06","Private Credit",724.72,8.35,0.635,0.587,737.67],["2026-07","Private Credit",737.67,17.34,-0.04,-0.361,754.72],["2026-08","Private Credit",754.72,17.31,0.785,0.468,777.95],["2026-09","Private Credit",777.95,20.62,0.035,0.239,798.84]]},"inv":{"cols":["client","itype","region","fund","old","now"],"rows":[["Client 001","Sovereign & pension","UAE","Global Equity",47.57,82.55],["Client 002","Wealth platform","Qatar","Global Equity",20.81,34.74],["Client 003","Private bank","Asia","Global Equity",31.04,55.93],["Client 004","Private bank","Kuwait","Global Equity",29.44,44.72],["Client 005","Insurance","Bahrain & Oman","Global Equity",46.58,72.53],["Client 006","Insurance","UAE","Global Equity",60.91,93.11],["Client 007","Family office","Saudi Arabia","Global Equity",17.67,26.76],["Client 008","Family office","Saudi Arabia","Global Equity",14.93,9.31],["Client 009","Wealth platform","UAE","Global Equity",50.62,77.61],["Client 010","Sovereign & pension","Europe","Global Equity",52.73,75.02],["Client 011","Wealth platform","Europe","Global Equity",17.21,29.49],["Client 012","Private bank","Saudi Arabia","Global Equity",40.66,42.41],["Client 013","Private bank","Europe","Global Equity",17.64,27.16],["Client 014","Wealth platform","Qatar","Global Equity",52.64,89.38],["Client 015","Wealth platform","Europe","Global Equity",15.21,11.17],["Client 016","Family office","UAE","Global Equity",12.88,17.56],["Client 017","Sovereign & pension","Saudi Arabia","Global Equity",49.49,70.59],["Client 018","Private bank","Kuwait","Global Equity",41.68,72.58],["Client 019","Private bank","Europe","Global Equity",29.41,26.49],["Client 020","Family office","Europe","Global Equity",13.63,19.91],["Client 021","Wealth platform","Saudi Arabia","Global Equity",54.75,46.59],["Client 022","Family office","Europe","Global Equity",12.85,22.26],["Client 023","Wealth platform","UAE","Global Equity",18.77,26.69],["Client 024","Wealth platform","UAE","Global Equity",41.98,30.32],["Client 025","Wealth platform","Kuwait","Global Equity",46.39,42.24],["Client 026","Wealth platform","Kuwait","Global Equity",52.14,55.13],["Client 027","Private bank","UAE","Global Equity",20.44,30.11],["Client 028","Family office","UAE","Global Equity",11.58,21.01],["Client 029","Wealth platform","Europe","Global Equity",40.23,61.29],["Client 030","Private bank","UAE","Global Equity",43.8,68.36],["Client 031","Private bank","Kuwait","Global Equity",25.51,43.09],["Client 032","Wealth platform","UAE","Global Equity",11.95,16.27],["Client 033","Family office","UAE","Global Equity",16.83,27.66],["Client 034","Wealth platform","Saudi Arabia","Global Equity",46.56,69.02],["Client 035","Private bank","UAE","Global Equity",32.66,48.19],["Client 036","Family office","Asia","Global Equity",16.09,25.16],["Client 037","Private bank","Saudi Arabia","Global Equity",29.42,50.61],["Client 038","Private bank","Bahrain & Oman","Global Equity",41.11,54.99],["Client 039","Private bank","Kuwait","MENA Equity",39.97,53.39],["Client 040","Wealth platform","Saudi Arabia","MENA Equity",28.78,0.0],["Client 041","Family office","Europe","MENA Equity",22.99,41.87],["Client 042","Wealth platform","Saudi Arabia","MENA Equity",48.71,84.36],["Client 043","Private bank","Asia","MENA Equity",17.73,31.31],["Client 044","Family office","UAE","MENA Equity",4.47,8.58],["Client 045","Private bank","UAE","MENA Equity",6.0,12.87],["Client 046","Family office","UAE","MENA Equity",9.07,8.77],["Client 047","Private bank","UAE","MENA Equity",19.61,0.0],["Client 048","Private bank","UAE","MENA Equity",40.18,74.35],["Client 049","Family office","Europe","MENA Equity",23.79,18.24],["Client 050","Private bank","Saudi Arabia","MENA Equity",19.56,34.95],["Client 051","Wealth platform","UAE","MENA Equity",11.78,23.59],["Client 052","Wealth platform","Saudi Arabia","MENA Equity",27.79,49.75],["Client 053","Private bank","Asia","MENA Equity",10.6,22.01],["Client 054","Private bank","Kuwait","MENA Equity",42.42,68.42],["Client 055","Private bank","UAE","MENA Equity",15.34,30.34],["Client 056","Wealth platform","UAE","MENA Equity",11.04,17.8],["Client 057","Wealth platform","Saudi Arabia","MENA Equity",16.73,36.34],["Client 058","Private bank","UAE","MENA Equity",24.81,48.8],["Client 059","Family office","Europe","MENA Equity",15.53,32.94],["Client 060","Wealth platform","Asia","MENA Equity",38.7,0.0],["Client 061","Private bank","Kuwait","MENA Equity",16.57,32.93],["Client 062","Private bank","Bahrain & Oman","MENA Equity",18.25,40.21],["Client 063","Family office","Saudi Arabia","MENA Equity",12.07,0.0],["Client 064","Private bank","UAE","MENA Equity",43.79,0.0],["Client 065","Private bank","Europe","MENA Equity",12.29,24.56],["Client 066","Private bank","UAE","MENA Equity",22.06,14.3],["Client 067","Corporate treasury","Saudi Arabia","Sukuk & Fixed Income",26.9,28.45],["Client 068","Corporate treasury","Saudi Arabia","Sukuk & Fixed Income",28.9,36.66],["Client 069","Corporate treasury","Asia","Sukuk & Fixed Income",9.08,4.87],["Client 070","Corporate treasury","Kuwait","Sukuk & Fixed Income",13.62,16.23],["Client 071","Corporate treasury","UAE","Sukuk & Fixed Income",12.54,14.17],["Client 072","Sovereign & pension","Saudi Arabia","Sukuk & Fixed Income",124.1,159.51],["Client 073","Insurance","Bahrain & Oman","Sukuk & Fixed Income",53.04,52.98],["Client 074","Insurance","Qatar","Sukuk & Fixed Income",46.67,54.53],["Client 075","Insurance","UAE","Sukuk & Fixed Income",56.95,74.88],["Client 076","Sovereign & pension","Kuwait","Sukuk & Fixed Income",74.99,90.77],["Client 077","Corporate treasury","Saudi Arabia","Sukuk & Fixed Income",23.33,16.64],["Client 078","Corporate treasury","UAE","Sukuk & Fixed Income",17.41,16.97],["Client 079","Sovereign & pension","UAE","Sukuk & Fixed Income",78.31,96.29],["Client 080","Sovereign & pension","Saudi Arabia","Sukuk & Fixed Income",65.17,85.24],["Client 081","Private bank","Europe","Sukuk & Fixed Income",24.29,26.97],["Client 082","Corporate treasury","UAE","Sukuk & Fixed Income",14.39,7.76],["Client 083","Insurance","UAE","Sukuk & Fixed Income",57.11,61.55],["Client 084","Private bank","Saudi Arabia","Sukuk & Fixed Income",29.71,30.2],["Client 085","Corporate treasury","UAE","Sukuk & Fixed Income",15.09,17.77],["Client 086","Insurance","Kuwait","Sukuk & Fixed Income",57.65,62.91],["Client 087","Insurance","UAE","Sukuk & Fixed Income",38.66,14.85],["Client 088","Corporate treasury","UAE","Sukuk & Fixed Income",24.37,26.97],["Client 089","Insurance","UAE","Sukuk & Fixed Income",25.92,25.74],["Client 090","Private bank","Saudi Arabia","Sukuk & Fixed Income",32.23,41.29],["Client 091","Corporate treasury","Europe","Sukuk & Fixed Income",12.85,15.73],["Client 092","Insurance","Europe","Sukuk & Fixed Income",30.59,34.72],["Client 093","Corporate treasury","UAE","Sukuk & Fixed Income",12.03,13.14],["Client 094","Corporate treasury","UAE","Sukuk & Fixed Income",4.89,5.03],["Client 095","Insurance","UAE","Sukuk & Fixed Income",16.53,16.97],["Client 096","Private bank","UAE","Sukuk & Fixed Income",31.27,38.01],["Client 097","Insurance","Bahrain & Oman","Sukuk & Fixed Income",30.29,39.82],["Client 098","Insurance","Kuwait","Sukuk & Fixed Income",46.39,49.57],["Client 099","Corporate treasury","UAE","Sukuk & Fixed Income",6.4,6.18],["Client 100","Insurance","Asia","Sukuk & Fixed Income",31.87,16.33],["Client 101","Insurance","UAE","Multi-Asset Balanced",26.84,30.85],["Client 102","Private bank","Europe","Multi-Asset Balanced",35.56,35.76],["Client 103","Wealth platform","Saudi Arabia","Multi-Asset Balanced",40.23,36.54],["Client 104","Private bank","Asia","Multi-Asset Balanced",15.61,16.19],["Client 105","Private bank","Bahrain & Oman","Multi-Asset Balanced",16.25,14.54],["Client 106","Family office","UAE","Multi-Asset Balanced",11.23,5.02],["Client 107","Wealth platform","Saudi Arabia","Multi-Asset Balanced",34.21,39.09],["Client 108","Family office","Asia","Multi-Asset Balanced",4.14,4.36],["Client 109","Family office","Saudi Arabia","Multi-Asset Balanced",15.18,16.68],["Client 110","Family office","UAE","Multi-Asset Balanced",5.32,5.28],["Client 111","Private bank","Kuwait","Multi-Asset Balanced",35.62,32.23],["Client 112","Wealth platform","Saudi Arabia","Multi-Asset Balanced",32.35,33.84],["Client 113","Private bank","Asia","Multi-Asset Balanced",6.26,5.74],["Client 114","Wealth platform","Kuwait","Multi-Asset Balanced",38.45,42.94],["Client 115","Private bank","UAE","Multi-Asset Balanced",33.44,35.66],["Client 116","Private bank","Saudi Arabia","Multi-Asset Balanced",31.84,34.35],["Client 117","Private bank","Bahrain & Oman","Multi-Asset Balanced",23.01,23.17],["Client 118","Wealth platform","Europe","Multi-Asset Balanced",36.5,41.22],["Client 119","Private bank","UAE","Multi-Asset Balanced",35.52,10.32],["Client 120","Wealth platform","Kuwait","Multi-Asset Balanced",24.79,23.22],["Client 121","Family office","UAE","Multi-Asset Balanced",10.91,12.27],["Client 122","Private bank","UAE","Multi-Asset Balanced",35.4,38.3],["Client 123","Wealth platform","Bahrain & Oman","Multi-Asset Balanced",15.96,9.64],["Client 124","Private bank","UAE","Multi-Asset Balanced",28.09,0.0],["Client 125","Private bank","Saudi Arabia","Multi-Asset Balanced",31.47,31.08],["Client 126","Wealth platform","UAE","Multi-Asset Balanced",18.69,17.9],["Client 127","Wealth platform","Europe","Multi-Asset Balanced",25.89,29.96],["Client 128","Wealth platform","UAE","Multi-Asset Balanced",19.22,18.24],["Client 129","Private bank","UAE","Multi-Asset Balanced",27.38,13.75],["Client 130","Family office","Asia","Multi-Asset Balanced",4.06,4.27],["Client 131","Sovereign & pension","UAE","Private Credit",38.27,54.3],["Client 132","Sovereign & pension","Qatar","Private Credit",55.44,75.3],["Client 133","Sovereign & pension","UAE","Private Credit",87.81,108.14],["Client 134","Family office","Kuwait","Private Credit",9.61,11.78],["Client 135","Insurance","Kuwait","Private Credit",23.87,36.27],["Client 136","Family office","Saudi Arabia","Private Credit",14.09,21.07],["Client 137","Insurance","Saudi Arabia","Private Credit",15.37,22.9],["Client 138","Insurance","Bahrain & Oman","Private Credit",28.38,36.61],["Client 139","Family office","Europe","Private Credit",4.72,5.63],["Client 140","Family office","Europe","Private Credit",13.81,17.37],["Client 141","Sovereign & pension","Saudi Arabia","Private Credit",34.21,48.59],["Client 142","Sovereign & pension","UAE","Private Credit",69.38,108.91],["Client 143","Family office","Saudi Arabia","Private Credit",2.06,3.03],["Client 144","Sovereign & pension","Qatar","Private Credit",80.16,113.59],["Client 145","Sovereign & pension","Europe","Private Credit",72.78,100.24],["Client 146","Insurance","Bahrain & Oman","Private Credit",24.9,35.12]]}};</script>
+<script>
+window.H = (function () {
+  const MN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const MONTHS = [];
+  for (let y = 2024; y <= 2026; y++) for (let m = 1; m <= 12; m++) {
+    const k = y + '-' + String(m).padStart(2, '0');
+    if (k <= '2026-09') MONTHS.push(k);
+  }
+  const PERIODS = {
+    'Last 12 months': { cur: ['2025-10', '2026-09'], prior: ['2024-10', '2025-09'] },
+    '2026 to date': { cur: ['2026-01', '2026-09'], prior: ['2025-01', '2025-09'] },
+    '2025': { cur: ['2025-01', '2025-12'], prior: ['2024-01', '2024-12'] },
+    '2024': { cur: ['2024-01', '2024-12'], prior: null }
+  };
+  const MINUS = '\u2212';
+
+  function monthLabel(m) { return MN[+m.slice(5) - 1] + ' \u2019' + m.slice(2, 4); }
+  function monthLong(m) { return MN[+m.slice(5) - 1] + ' ' + m.slice(0, 4); }
+  function quarter(m) { return m.slice(0, 4) + ' Q' + Math.ceil(+m.slice(5) / 3); }
+  function inRange(m, r) { return !!r && m >= r[0] && m <= r[1]; }
+  function monthsIn(r) { return r ? MONTHS.filter(m => inRange(m, r)) : []; }
+  function rangeText(r) { return monthLong(r[0]) + ' to ' + monthLong(r[1]); }
+  function periodSub(x) {
+    const P = x.P;
+    return P.prior ? rangeText(P.cur) + ', compared with ' + rangeText(P.prior)
+                   : rangeText(P.cur) + ' (no earlier data to compare)';
+  }
+  function rowsFrom(t) {
+    return t.rows.map(r => { const o = {}; t.cols.forEach((c, i) => { o[c] = r[i]; }); return o; });
+  }
+  function match(row, state, keys) {
+    for (const k of keys) { const v = state[k]; if (v && v !== 'All' && row[k] !== v) return false; }
+    return true;
+  }
+  function sum(rows, f) {
+    let s = 0;
+    for (const r of rows) { const v = typeof f === 'function' ? f(r) : r[f]; if (v) s += v; }
+    return s;
+  }
+  function group(rows, key) {
+    const m = new Map();
+    for (const r of rows) {
+      const k = typeof key === 'function' ? key(r) : r[key];
+      if (!m.has(k)) m.set(k, []);
+      m.get(k).push(r);
+    }
+    return m;
+  }
+  function ok(v) { return v !== null && v !== undefined && isFinite(v); }
+  function sign(v) { return v > 0 ? '+' : v < 0 ? MINUS : ''; }
+  function short(v, dp) {
+    if (!ok(v)) return '\u2013';
+    const a = Math.abs(v); let s;
+    if (a >= 1e9) s = (a / 1e9).toFixed(dp ?? (a >= 1e10 ? 1 : 2)) + 'B';
+    else if (a >= 1e6) s = (a / 1e6).toFixed(dp ?? (a >= 1e8 ? 0 : 1)) + 'M';
+    else if (a >= 1e3) s = (a / 1e3).toFixed(dp ?? (a >= 1e5 ? 0 : 1)) + 'K';
+    else s = String(Math.round(a));
+    return (v < 0 ? MINUS : '') + s;
+  }
+  function money(v, cur, dp) {
+    if (!ok(v)) return '\u2013';
+    const body = short(Math.abs(v), dp);
+    if (cur === 'USD') return (v < 0 ? MINUS : '') + '$' + body;
+    return 'AED ' + (v < 0 ? MINUS : '') + body;
+  }
+  function usdM(v, dp) { return ok(v) ? money(v * 1e6, 'USD', dp) : '\u2013'; }
+  function num(v, dp) {
+    if (!ok(v)) return '\u2013';
+    const s = Math.abs(v).toLocaleString('en-US', { maximumFractionDigits: dp || 0, minimumFractionDigits: dp || 0 });
+    return (v < 0 ? MINUS : '') + s;
+  }
+  function pct(v, dp) {
+    if (!ok(v)) return '\u2013';
+    const s = Math.abs(v * 100).toFixed(dp ?? 1) + '%';
+    return (v < 0 ? MINUS : '') + s;
+  }
+  function pts(v, dp) { return ok(v) ? Math.abs(v * 100).toFixed(dp ?? 1) + ' points' : '\u2013'; }
+  function updown(v) { return v >= 0 ? 'up' : 'down'; }
+  /* Delta note for KPI tiles. mode: pct (relative), pts (percentage points of two fractions), abs (difference, formatted by fmt). */
+  function delta(cur, prev, o) {
+    o = o || {};
+    if (!ok(cur)) return { note: '', tone: '' };
+    if (!ok(prev) || (o.mode === 'pct' && prev === 0)) return { note: 'No earlier data to compare', tone: '' };
+    const d = o.mode === 'pct' ? (cur - prev) / Math.abs(prev) : cur - prev;
+    let txt;
+    if (o.mode === 'pct') txt = sign(d) + Math.abs(d * 100).toFixed(1) + '%';
+    else if (o.mode === 'pts') txt = sign(d) + Math.abs(d * 100).toFixed(1) + ' pts';
+    else txt = sign(d) + (o.fmt ? o.fmt(Math.abs(d)) : Math.abs(d).toFixed(1));
+    const flat = Math.abs(d) < (o.mode === 'abs' ? 1e-9 : 0.0005);
+    let tone = '';
+    if (!flat && o.good === 'up') tone = d > 0 ? 'pos' : 'neg';
+    if (!flat && o.good === 'down') tone = d < 0 ? 'pos' : 'neg';
+    return { note: txt + ' vs prior period', tone };
+  }
+  function top(entries, f) { return entries.slice().sort((a, b) => f(b) - f(a))[0]; }
+  return { MONTHS, PERIODS, MINUS, monthLabel, monthLong, quarter, inRange, monthsIn, rangeText, periodSub,
+    rowsFrom, match, sum, group, ok, sign, short, money, usdM, num, pct, pts, updown, delta, top };
+})();
+
+window.Charts = (function () {
+  const NS = 'http://www.w3.org/2000/svg';
+  const FS = 11.5;
+  function el(tag, attrs, parent) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function txt(parent, x, y, s, attrs) {
+    const t = el('text', Object.assign({ x, y, 'font-size': FS }, attrs || {}), parent);
+    t.textContent = s;
+    return t;
+  }
+  const tw = s => String(s).length * 6.2;
+  function nice(min, max, count) {
+    if (!isFinite(min) || !isFinite(max)) { min = 0; max = 1; }
+    if (min === max) { max = min === 0 ? 1 : min * 1.1; if (max < min) [min, max] = [max, min]; }
+    const span = max - min;
+    let step = Math.pow(10, Math.floor(Math.log10(span / count)));
+    const err = span / count / step;
+    if (err >= 7.5) step *= 10; else if (err >= 3.5) step *= 5; else if (err >= 1.5) step *= 2;
+    const lo = Math.floor(min / step + 1e-9) * step, hi = Math.ceil(max / step - 1e-9) * step;
+    const ticks = [];
+    for (let v = lo; v <= hi + step / 2; v += step) ticks.push(+v.toFixed(10));
+    return { lo, hi: hi === lo ? lo + step : hi, ticks };
+  }
+  /* Pick a tick count whose labels fit the available width */
+  function fitTicks(lo, hi, width, fmt, maxCount) {
+    let cnt = maxCount || 5, X = nice(lo, hi, cnt);
+    for (let k = 0; k < 6; k++) {
+      const lw = Math.max(...X.ticks.map(t => tw(fmt(t)))) + 16;
+      if (width / Math.max(1, X.ticks.length - 1) >= lw || cnt <= 2) break;
+      cnt--; X = nice(lo, hi, cnt);
+    }
+    return X;
+  }
+  function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function tipHTML(title, rows, extra) {
+    let h = '<strong>' + esc(title) + '</strong>';
+    for (const r of rows) h += '<span class="row"><i style="background:' + r.color + '"></i>' + esc(r.name) + '<b>' + esc(r.value) + '</b></span>';
+    for (const e of (extra || [])) h += '<span class="extra">' + esc(e) + '</span>';
+    return h;
+  }
+  function getTip(plot) {
+    let t = plot.querySelector('.tip');
+    if (!t) { t = document.createElement('div'); t.className = 'tip'; t.setAttribute('role', 'status'); plot.appendChild(t); }
+    t.hidden = true;
+    return t;
+  }
+  function showTip(plot, tip, html, x, y) {
+    tip.innerHTML = html; tip.hidden = false;
+    const pw = plot.clientWidth, ph = plot.clientHeight, w = tip.offsetWidth, h = tip.offsetHeight;
+    let lx = x + 16; if (lx + w > pw) lx = x - 16 - w; if (lx < 0) lx = Math.max(0, Math.min(pw - w, x - w / 2));
+    let ly = y - h / 2; if (ly < 0) ly = 0; if (ly + h > ph) ly = Math.max(0, ph - h);
+    tip.style.left = lx + 'px'; tip.style.top = ly + 'px';
+  }
+  function legend(lg, items) {
+    lg.innerHTML = '';
+    if (!items || !items.length) { lg.hidden = true; return; }
+    lg.hidden = false;
+    for (const it of items) {
+      const s = document.createElement('span'); s.className = 'key';
+      const sw = document.createElement('i'); sw.style.background = it.color; if (it.line) sw.className = 'line';
+      s.append(sw, document.createTextNode(it.name));
+      lg.append(s);
+    }
+  }
+  function svgPoint(svg, ev) { const r = svg.getBoundingClientRect(); return [ev.clientX - r.left, ev.clientY - r.top]; }
+
+  /* Vertical bars and/or lines over shared categories, optional right axis. */
+  function cartesian(svg, plot, lg, spec, pal, W, Hh, tip) {
+    const cats = spec.categories, n = cats.length;
+    const kindOf = s => s.type || (spec.kind === 'lines' ? 'line' : 'bar');
+    const prim = spec.series.filter(s => s.axis !== 'y2'), sec = spec.series.filter(s => s.axis === 'y2');
+    const hasBars = spec.series.some(s => kindOf(s) === 'bar');
+    const stackKey = s => (s.stack !== undefined ? s.stack : (spec.stacked ? '_' : s.name));
+    // stacked cumulative values for primary series
+    const cum = new Map();
+    let pmin = Infinity, pmax = -Infinity;
+    if (spec.stacked) {
+      const pos = {}, neg = {};
+      for (const s of prim) {
+        const k = stackKey(s); pos[k] = pos[k] || new Array(n).fill(0); neg[k] = neg[k] || new Array(n).fill(0);
+        cum.set(s, s.values.map((v, i) => {
+          v = v || 0;
+          const base = v >= 0 ? pos[k][i] : neg[k][i];
+          if (v >= 0) pos[k][i] += v; else neg[k][i] += v;
+          return [base, base + v];
+        }));
+      }
+      for (const k in pos) pos[k].forEach(v => { pmax = Math.max(pmax, v); });
+      for (const k in neg) neg[k].forEach(v => { pmin = Math.min(pmin, v); });
+      pmin = Math.min(pmin, 0); pmax = Math.max(pmax, 0);
+    } else {
+      for (const s of prim) {
+        cum.set(s, s.values.map(v => [0, v]));
+        for (const v of s.values) if (v !== null && isFinite(v)) { pmin = Math.min(pmin, v); pmax = Math.max(pmax, v); }
+      }
+      if (hasBars) { pmin = Math.min(pmin, 0); pmax = Math.max(pmax, 0); }
+      else { const pad = (pmax - pmin) * 0.12 || Math.abs(pmax) * 0.05 || 1; pmin -= pad; pmax += pad; }
+    }
+    if (spec.yMin !== undefined) pmin = spec.yMin;
+    if (spec.yMax !== undefined) pmax = spec.yMax;
+    const P = nice(pmin, pmax, Hh < 220 ? 4 : 5);
+    let S = null;
+    if (sec.length) {
+      let a = Infinity, b = -Infinity;
+      for (const s of sec) for (const v of s.values) if (v !== null && isFinite(v)) { a = Math.min(a, v); b = Math.max(b, v); }
+      const pad = (b - a) * 0.15 || Math.abs(b) * 0.05 || 1;
+      S = nice(spec.y2Min !== undefined ? spec.y2Min : a - pad, spec.y2Max !== undefined ? spec.y2Max : b + pad, Hh < 220 ? 4 : 5);
+    }
+    const fy = spec.yTick || (v => String(v)), fy2 = spec.y2Tick || (v => String(v));
+    const left = Math.max(...P.ticks.map(t => tw(fy(t)))) + 12;
+    const right = S ? Math.max(...S.ticks.map(t => tw(fy2(t)))) + 12 : 10;
+    const top = 8, bottom = 26;
+    const pw = Math.max(10, W - left - right), ph = Math.max(10, Hh - top - bottom);
+    const band = pw / n;
+    const y = v => top + ph * (1 - (v - P.lo) / (P.hi - P.lo));
+    const y2 = S ? (v => top + ph * (1 - (v - S.lo) / (S.hi - S.lo))) : y;
+    const cx = i => left + band * (i + 0.5);
+    // grid
+    const g = el('g', {}, svg);
+    for (const t of P.ticks) {
+      el('line', { x1: left, x2: W - right, y1: y(t), y2: y(t), stroke: t === 0 && P.lo < 0 ? pal.muted : pal.rule, 'stroke-width': 1 }, g);
+      txt(g, left - 8, y(t) + 4, fy(t), { 'text-anchor': 'end', fill: pal.muted });
+    }
+    if (S) for (const t of S.ticks) txt(g, W - right + 8, y2(t) + 4, fy2(t), { 'text-anchor': 'start', fill: pal.muted });
+    const hl = el('rect', { x: 0, y: top, width: band, height: ph, fill: pal.ink, opacity: 0 }, svg);
+    // x labels
+    const labW = Math.max(...cats.map(c => tw(c))) + 12;
+    const every = Math.max(1, Math.ceil(n / Math.max(1, Math.floor(pw / labW))));
+    cats.forEach((c, i) => {
+      if (i % every !== 0 && i !== n - 1) return;
+      if (i === n - 1 && i % every !== 0 && (n - 1) % every < every * 0.6) return;
+      txt(svg, cx(i), Hh - 8, c, { 'text-anchor': 'middle', fill: pal.muted });
+    });
+    // bars
+    const barSeries = spec.series.filter(s => kindOf(s) === 'bar' && s.axis !== 'y2');
+    const slots = [...new Set(barSeries.map(stackKey))];
+    const gw = band * (slots.length > 1 ? 0.8 : (n > 24 ? 0.72 : 0.62)), sw = gw / Math.max(1, slots.length);
+    for (const s of barSeries) {
+      const k = slots.indexOf(stackKey(s));
+      cum.get(s).forEach(([a, b], i) => {
+        const v = s.values[i]; if (v === null || v === undefined || !isFinite(v)) return;
+        const y0 = y(a), y1 = y(b);
+        const x = left + band * i + (band - gw) / 2 + k * sw + (slots.length > 1 ? 1 : 0);
+        el('rect', { x, y: Math.min(y0, y1), width: Math.max(1, sw - (slots.length > 1 ? 2 : 0)), height: Math.max(0.5, Math.abs(y1 - y0)),
+          fill: (s.colors && s.colors[i]) || s.color }, svg);
+      });
+    }
+    // lines and areas
+    const lineSeries = spec.series.filter(s => kindOf(s) === 'line');
+    const areaSeries = lineSeries.filter(s => s.fill && s.axis !== 'y2');
+    for (const s of areaSeries) {
+      const c = cum.get(s); let d = '';
+      c.forEach(([, b], i) => { d += (i ? 'L' : 'M') + cx(i).toFixed(1) + ',' + y(b).toFixed(1); });
+      for (let i = n - 1; i >= 0; i--) d += 'L' + cx(i).toFixed(1) + ',' + y(c[i][0]).toFixed(1);
+      el('path', { d: d + 'Z', fill: s.color, opacity: 0.82 }, svg);
+    }
+    for (const s of lineSeries) {
+      const fy_ = s.axis === 'y2' ? y2 : y;
+      const vals = s.axis === 'y2' ? s.values.map(v => [0, v]) : cum.get(s);
+      let d = '', pen = false;
+      vals.forEach(([, v], i) => {
+        if (v === null || v === undefined || !isFinite(v)) { pen = false; return; }
+        d += (pen ? 'L' : 'M') + cx(i).toFixed(1) + ',' + fy_(v).toFixed(1); pen = true;
+      });
+      el('path', { d, fill: 'none', stroke: s.color, 'stroke-width': s.fill ? 1.25 : 2.25, 'stroke-linejoin': 'round', 'stroke-linecap': 'round',
+        'stroke-dasharray': s.dash ? '5 4' : 'none' }, svg);
+      if (n <= 16 && !s.fill) vals.forEach(([, v], i) => {
+        if (v === null || !isFinite(v)) return;
+        el('circle', { cx: cx(i), cy: fy_(v), r: 3, fill: pal.surface, stroke: s.color, 'stroke-width': 2 }, svg);
+      });
+    }
+    // hover
+    const ov = el('rect', { x: left, y: top, width: pw, height: ph, fill: 'transparent', class: 'hit' }, svg);
+    const move = ev => {
+      const [px, py] = svgPoint(svg, ev);
+      const i = Math.max(0, Math.min(n - 1, Math.floor((px - left) / band)));
+      hl.setAttribute('x', left + band * i); hl.setAttribute('width', band); hl.setAttribute('opacity', 0.06);
+      const rows = spec.series.filter(s => !s.hideTip).map(s => ({ name: s.name, color: (s.colors && s.colors[i]) || s.color,
+        value: (s.fmt || (s.axis === 'y2' ? fy2 : fy))(s.values[i]) })).filter(r => r.value !== '' && r.value !== null);
+      const title = spec.tipTitle ? spec.tipTitle(i) : cats[i];
+      showTip(plot, tip, tipHTML(title, rows, spec.tipExtra ? spec.tipExtra(i) : null), cx(i), py);
+    };
+    ov.addEventListener('pointermove', move); ov.addEventListener('pointerdown', move);
+    ov.addEventListener('pointerleave', () => { tip.hidden = true; hl.setAttribute('opacity', 0); });
+    legend(lg, spec.legend !== undefined ? spec.legend : (spec.series.length > 1 ? spec.series.map(s => ({ name: s.name, color: s.color, line: kindOf(s) === 'line' && !s.fill })) : null));
+  }
+
+  /* Horizontal bars: categories down the side, one or two series. */
+  function hbars(svg, plot, lg, spec, pal, W, Hh, tip) {
+    const cats = spec.categories, n = cats.length, ser = spec.series, ns = ser.length;
+    let a = Infinity, b = -Infinity;
+    for (const s of ser) for (const v of s.values) if (v !== null && isFinite(v)) { a = Math.min(a, v); b = Math.max(b, v); }
+    const fx = spec.xTick || (v => String(v));
+    const left = Math.min(Math.max(...cats.map(c => tw(c))) + 14, W * 0.42), right = ns === 1 && spec.labels !== false ? 58 : 14;
+    const top = spec.target ? 18 : 4, bottom = 24;
+    const pw = Math.max(10, W - left - right), ph = Math.max(10, Hh - top - bottom), band = ph / n;
+    const X = fitTicks(spec.xMin !== undefined ? spec.xMin : Math.min(0, a), spec.xMax !== undefined ? spec.xMax : Math.max(0, b), pw, fx, 5);
+    const x = v => left + pw * (Math.max(X.lo, Math.min(X.hi, v)) - X.lo) / (X.hi - X.lo);
+    for (const t of X.ticks) {
+      el('line', { x1: x(t), x2: x(t), y1: top, y2: top + ph, stroke: pal.rule }, svg);
+      txt(svg, x(t), Hh - 8, fx(t), { 'text-anchor': 'middle', fill: pal.muted });
+    }
+    const hl = el('rect', { x: 0, y: top, width: W, height: band, fill: pal.ink, opacity: 0 }, svg);
+    const gh = band * (ns > 1 ? 0.78 : 0.62), sh = gh / ns;
+    cats.forEach((c, i) => {
+      const cy = top + band * (i + 0.5);
+      let label = c; while (tw(label) > left - 12 && label.length > 4) label = label.slice(0, -2);
+      if (label !== c) label = label.slice(0, -1) + '\u2026';
+      txt(svg, left - 8, cy + 4, label, { 'text-anchor': 'end', fill: pal.ink });
+      ser.forEach((s, k) => {
+        const v = s.values[i]; if (v === null || v === undefined || !isFinite(v)) return;
+        const x0 = x(Math.max(X.lo, 0)), x1 = x(v);
+        el('rect', { x: Math.min(x0, x1), y: top + band * i + (band - gh) / 2 + k * sh + (ns > 1 ? 1 : 0), width: Math.max(1, Math.abs(x1 - x0)),
+          height: Math.max(1, sh - (ns > 1 ? 2 : 0)), fill: (s.colors && s.colors[i]) || s.color }, svg);
+        if (ns === 1 && spec.labels !== false) txt(svg, x1 + 6, cy + 4, (s.fmt || fx)(v), { fill: pal.ink, 'font-weight': 500 });
+      });
+    });
+    if (spec.target) {
+      const tx = x(spec.target.value);
+      el('line', { x1: tx, x2: tx, y1: top - 4, y2: top + ph, stroke: pal.ink, 'stroke-dasharray': '3 3' }, svg);
+      txt(svg, tx, top - 7, spec.target.label, { 'text-anchor': 'middle', fill: pal.ink, 'font-size': 11 });
+    }
+    const ov = el('rect', { x: 0, y: top, width: W, height: ph, fill: 'transparent', class: 'hit' }, svg);
+    const move = ev => {
+      const [px, py] = svgPoint(svg, ev);
+      const i = Math.max(0, Math.min(n - 1, Math.floor((py - top) / band)));
+      hl.setAttribute('y', top + band * i); hl.setAttribute('opacity', 0.06);
+      const rows = ser.map(s => ({ name: s.name, color: (s.colors && s.colors[i]) || s.color, value: (s.fmt || fx)(s.values[i]) }));
+      showTip(plot, tip, tipHTML(cats[i], rows, spec.tipExtra ? spec.tipExtra(i) : null), Math.min(px, W - 40), top + band * (i + 0.5));
+    };
+    ov.addEventListener('pointermove', move); ov.addEventListener('pointerdown', move);
+    ov.addEventListener('pointerleave', () => { tip.hidden = true; hl.setAttribute('opacity', 0); });
+    legend(lg, spec.legend !== undefined ? spec.legend : (ns > 1 ? ser.map(s => ({ name: s.name, color: s.color })) : null));
+  }
+
+  function donut(svg, plot, lg, spec, pal, W, Hh, tip) {
+    const items = spec.items.filter(it => it.value > 0);
+    const total = items.reduce((s, it) => s + it.value, 0);
+    const r = Math.max(20, Math.min(W, Hh) / 2 - 6), ri = r * 0.64, cx = W / 2, cy = Hh / 2;
+    if (!total) { txt(svg, cx, cy, 'No data for these filters', { 'text-anchor': 'middle', fill: pal.muted }); legend(lg, null); return; }
+    let a0 = -Math.PI / 2;
+    const paths = [];
+    for (const it of items) {
+      const a1 = a0 + (it.value / total) * Math.PI * 2;
+      const large = a1 - a0 > Math.PI ? 1 : 0;
+      const p = (rad, a) => [cx + rad * Math.cos(a), cy + rad * Math.sin(a)];
+      let d;
+      if (items.length === 1) {
+        d = `M${cx - r},${cy}A${r},${r} 0 1 1 ${cx + r},${cy}A${r},${r} 0 1 1 ${cx - r},${cy}ZM${cx - ri},${cy}A${ri},${ri} 0 1 0 ${cx + ri},${cy}A${ri},${ri} 0 1 0 ${cx - ri},${cy}Z`;
+      } else {
+        const [x0, y0] = p(r, a0), [x1, y1] = p(r, a1), [x2, y2] = p(ri, a1), [x3, y3] = p(ri, a0);
+        d = `M${x0},${y0}A${r},${r} 0 ${large} 1 ${x1},${y1}L${x2},${y2}A${ri},${ri} 0 ${large} 0 ${x3},${y3}Z`;
+      }
+      const path = el('path', { d, fill: it.color, stroke: pal.surface, 'stroke-width': 2, 'fill-rule': 'evenodd', class: 'seg' }, svg);
+      const show = ev => {
+        paths.forEach(q => q.setAttribute('opacity', q === path ? 1 : 0.45));
+        const [px, py] = svgPoint(svg, ev);
+        showTip(plot, tip, tipHTML(it.label, [{ name: 'Share', color: it.color, value: (it.value / total * 100).toFixed(1) + '%' },
+          { name: spec.valueName || 'Value', color: it.color, value: spec.format(it.value) }]), px, py);
+      };
+      path.addEventListener('pointermove', show); path.addEventListener('pointerdown', show);
+      path.addEventListener('pointerleave', () => { tip.hidden = true; paths.forEach(q => q.setAttribute('opacity', 1)); });
+      paths.push(path); a0 = a1;
+    }
+    if (spec.centerValue) txt(svg, cx, cy + 2, spec.centerValue, { 'text-anchor': 'middle', fill: pal.ink, 'font-size': Math.min(22, r * 0.3), 'font-weight': 600, class: 'tnum' });
+    if (spec.centerLabel) txt(svg, cx, cy + 20, spec.centerLabel, { 'text-anchor': 'middle', fill: pal.muted, 'font-size': 11 });
+    legend(lg, items.map(it => ({ name: it.label + ' ' + Math.round(it.value / total * 100) + '%', color: it.color })));
+  }
+
+  function bubble(svg, plot, lg, spec, pal, W, Hh, tip) {
+    const pts = spec.points.filter(p => isFinite(p.x) && isFinite(p.y));
+    if (!pts.length) { txt(svg, W / 2, Hh / 2, 'No data for these filters', { 'text-anchor': 'middle', fill: pal.muted }); legend(lg, null); return; }
+    const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+    const xp = (Math.max(...xs) - Math.min(...xs)) * 0.15 || Math.max(...xs) * 0.2, yp = (Math.max(...ys) - Math.min(...ys)) * 0.18 || 1;
+    const fx = spec.xTick, fy = spec.yTick;
+    const Y = nice(Math.min(...ys) - yp, Math.max(...ys) + yp, 4);
+    const left = Math.max(...Y.ticks.map(t => tw(fy(t)))) + 12, right = 12, top = 18, bottom = 26;
+    const pw = W - left - right, ph = Hh - top - bottom;
+    const X = fitTicks(Math.min(...xs) - xp, Math.max(...xs) + xp, pw, fx, 5);
+    const x = v => left + pw * (v - X.lo) / (X.hi - X.lo), y = v => top + ph * (1 - (v - Y.lo) / (Y.hi - Y.lo));
+    for (const t of Y.ticks) { el('line', { x1: left, x2: W - right, y1: y(t), y2: y(t), stroke: pal.rule }, svg); txt(svg, left - 8, y(t) + 4, fy(t), { 'text-anchor': 'end', fill: pal.muted }); }
+    for (const t of X.ticks) txt(svg, x(t), Hh - 8, fx(t), { 'text-anchor': 'middle', fill: pal.muted });
+    if (spec.yTitle) txt(svg, left, 11, spec.yTitle, { fill: pal.muted, 'font-size': 11 });
+    if (spec.xTitle) txt(svg, W - right, Hh - 22 - 4, spec.xTitle, { 'text-anchor': 'end', fill: pal.muted, 'font-size': 11 });
+    const rmax = Math.max(...pts.map(p => p.r)) || 1, R = Math.min(26, pw / 14);
+    const sorted = pts.slice().sort((a, b) => b.r - a.r);
+    const placed = [], labels = [];
+    const hit = r => placed.some(q => r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1]);
+    for (const p of sorted) {
+      const rad = Math.max(5, Math.sqrt(p.r / rmax) * R), px = x(p.x), py = y(p.y);
+      const c = el('circle', { cx: px, cy: py, r: rad, fill: p.color, 'fill-opacity': 0.72, stroke: p.color, 'stroke-width': 1.5, class: 'seg' }, svg);
+      const w = tw(p.label) * 0.96;
+      const cands = [
+        { r: [px + rad + 4, py - 9, px + rad + 4 + w, py + 4], x: px + rad + 4, y: py + 4, a: 'start' },
+        { r: [px - rad - 4 - w, py - 9, px - rad - 4, py + 4], x: px - rad - 4, y: py + 4, a: 'end' },
+        { r: [px - w / 2, py - rad - 16, px + w / 2, py - rad - 3], x: px, y: py - rad - 5, a: 'middle' },
+        { r: [px - w / 2, py + rad + 3, px + w / 2, py + rad + 16], x: px, y: py + rad + 14, a: 'middle' }
+      ].filter(k => k.r[0] >= 0 && k.r[2] <= W && k.r[1] >= 0 && k.r[3] <= Hh - bottom + 4);
+      const pick = cands.find(k => !hit(k.r)) || cands[0];
+      if (pick) { placed.push(pick.r); labels.push([pick, p.label]); }
+      const show = ev => {
+        const [mx, my] = svgPoint(svg, ev);
+        showTip(plot, tip, tipHTML(p.label, [{ name: spec.xName, color: p.color, value: fx(p.x) }, { name: spec.yName, color: p.color, value: fy(p.y) },
+          { name: spec.rName, color: p.color, value: spec.rFormat(p.r) }]), mx, my);
+      };
+      c.addEventListener('pointermove', show); c.addEventListener('pointerdown', show);
+      c.addEventListener('pointerleave', () => { tip.hidden = true; });
+    }
+    for (const [k, label] of labels) txt(svg, k.x, k.y, label, { 'text-anchor': k.a, fill: pal.ink, 'font-size': 11, 'pointer-events': 'none' });
+    legend(lg, null);
+  }
+
+  function render(plot, lg, spec, pal) {
+    const old = plot.querySelector('svg'); if (old) old.remove();
+    if (spec.height) plot.style.height = spec.height + 'px';
+    const W = plot.clientWidth, Hh = plot.clientHeight;
+    if (!W || !Hh) return;
+    const svg = el('svg', { width: W, height: Hh, viewBox: `0 0 ${W} ${Hh}`, role: 'img', 'aria-label': spec.aria || '' });
+    plot.prepend(svg);
+    const tip = getTip(plot);
+    const empty = (spec.categories && !spec.categories.length);
+    if (empty) { txt(svg, W / 2, Hh / 2, 'No data for these filters', { 'text-anchor': 'middle', fill: pal.muted }); legend(lg, null); return; }
+    ({ bars: cartesian, lines: cartesian, hbars, donut, bubble })[spec.kind](svg, plot, lg, spec, pal, W, Hh, tip);
+  }
+  return { render };
+})();
+
+(function () {
+  const H = window.H, MROWS = H.rowsFrom(window.DASH_DATA.m), INV = H.rowsFrom(window.DASH_DATA.inv);
+  const FUNDS = ['Global Equity', 'MENA Equity', 'Sukuk & Fixed Income', 'Multi-Asset Balanced', 'Private Credit'];
+  const ITYPES = ['Sovereign & pension', 'Insurance', 'Family office', 'Private bank', 'Corporate treasury', 'Wealth platform'];
+  const REGIONS = ['UAE', 'Saudi Arabia', 'Kuwait', 'Qatar', 'Bahrain & Oman', 'Europe', 'Asia'];
+  const LIQ_BUCKETS = ['Next day', '2 to 7 days', '8 to 30 days', '31 to 90 days', 'Over 90 days'];
+  const LIQ = { 'Global Equity': [0.85, 0.12, 0.03, 0, 0], 'MENA Equity': [0.6, 0.3, 0.1, 0, 0], 'Sukuk & Fixed Income': [0.4, 0.4, 0.2, 0, 0],
+    'Multi-Asset Balanced': [0.55, 0.3, 0.12, 0.03, 0], 'Private Credit': [0, 0, 0.05, 0.15, 0.8] };
+  const LATEST = '2026-09';
+  const fundsOf = s => s.fund === 'All' ? FUNDS : [s.fund];
+  const rowsFor = s => MROWS.filter(r => s.fund === 'All' || r.fund === s.fund);
+  const byKey = new Map(MROWS.map(r => [r.fund + '|' + r.month, r]));
+  const aumAt = (s, m) => fundsOf(s).reduce((t, f) => t + (byKey.get(f + '|' + m) || { end: 0 }).end, 0);
+  const flows = (s, r) => r ? H.sum(rowsFor(s).filter(x => H.inRange(x.month, r)), 'flow') : null;
+  /* AUM-weighted composite return over a range, compounded monthly */
+  function perf(s, r, funds) {
+    if (!r) return null;
+    funds = funds || fundsOf(s);
+    let g = 1, b = 1;
+    for (const m of H.monthsIn(r)) {
+      let w = 0, rr = 0, bb = 0;
+      for (const f of funds) { const x = byKey.get(f + '|' + m); if (!x) continue; w += x.start; rr += x.start * x.ret / 100; bb += x.start * x.bench / 100; }
+      if (w) { g *= 1 + rr / w; b *= 1 + bb / w; }
+    }
+    return { ret: g - 1, bench: b - 1, ex: g - b };
+  }
+  const inv = s => INV.filter(r => (s.fund === 'All' || r.fund === s.fund) && (s.itype === 'All' || r.itype === s.itype));
+  const liq7 = s => { const fs = fundsOf(s), tot = fs.reduce((t, f) => t + aumAt({ fund: f }, LATEST), 0);
+    return tot ? fs.reduce((t, f) => t + aumAt({ fund: f }, LATEST) * (LIQ[f][0] + LIQ[f][1]), 0) / tot : null; };
+  const atRisk = s => inv(s).filter(r => r.old > 0 && r.now / r.old - 1 < -0.2);
+  const tickM = v => v >= 1000 || v <= -1000 ? (v < 0 ? H.MINUS : '') + '$' + (Math.abs(v) / 1000).toFixed(1) + 'B' : (v < 0 ? H.MINUS : '') + '$' + Math.abs(Math.round(v)) + 'M';
+
+  window.DASH_CONFIG = {
+    filters: [
+      { key: 'fund', label: 'Fund', all: 'All funds', options: FUNDS },
+      { key: 'itype', label: 'Client type', all: 'All client types', options: ITYPES }
+    ],
+    headline(x) {
+      const s = x.state, p = perf(s, x.P.cur), f = flows(s, x.P.cur), a = aumAt(s, x.P.cur[1]);
+      let main;
+      if (s.fund === 'All') {
+        const fp = FUNDS.map(fn => Object.assign({ f: fn }, perf(s, x.P.cur, [fn])));
+        const best = H.top(fp, z => z.ex), worst = H.top(fp, z => -z.ex);
+        main = `${best.f} beat its benchmark by ${H.pts(best.ex)} over the period, while ${worst.f} ` +
+          (worst.ex < 0 ? `fell short of its benchmark by ${H.pts(-worst.ex)}.` : `only just kept pace with its benchmark.`);
+      } else {
+        main = `${s.fund} returned ${H.pct(p.ret)} against ${H.pct(p.bench)} for its benchmark, ${p.ex >= 0 ? 'ahead' : 'behind'} by ${H.pts(Math.abs(p.ex))}.`;
+      }
+      const subs = [`Assets stand at ${H.usdM(a)} after ${H.usdM(Math.abs(f))} of net ${f >= 0 ? 'inflows' : 'outflows'} in the period.`];
+      const risk = atRisk(s);
+      if (risk.length) subs.push(`${risk.length} client${risk.length > 1 ? 's' : ''} cut their holding by more than 20% in the last 12 months, taking out ${H.usdM(H.sum(risk, r => r.old - r.now))}. The call list below starts with them.`);
+      else subs.push('No client in this selection cut their holding by more than 20% in the last 12 months.');
+      subs.push(`${H.pct(liq7(s), 0)} of assets could be paid out to investors within 7 days.`);
+      return { main, subs };
+    },
+    kpis(x) {
+      const s = x.state, P = x.P;
+      const a = aumAt(s, P.cur[1]), pa = P.prior ? aumAt(s, P.prior[1]) : null;
+      const f = flows(s, P.cur), pf = flows(s, P.prior), p = perf(s, P.cur);
+      const clients = inv(s).filter(r => r.now > 0), risk = atRisk(s);
+      return [
+        Object.assign({ label: 'Assets under management', value: H.usdM(a) }, H.delta(a, pa, { mode: 'pct', good: 'up' })),
+        Object.assign({ label: 'Net flows', value: (f >= 0 ? '+' : '') + H.usdM(f) }, H.delta(f, pf, { mode: 'abs', good: 'up', fmt: v => H.usdM(v) })),
+        { label: 'Return', value: H.pct(p.ret), note: 'Benchmark ' + H.pct(p.bench), tone: p.ex >= 0 ? 'pos' : 'neg' },
+        { label: 'Clients, Sep 2026', value: H.num(clients.length), note: risk.length ? risk.length + ' cut holdings by more than 20%' : 'None cut holdings by more than 20%', tone: risk.length ? 'neg' : 'pos' },
+        { label: 'Payable within 7 days', value: H.pct(liq7(s), 0), note: 'Share of assets, Sep 2026', tone: '' }
+      ];
+    },
+    charts: [
+      {
+        title: 'How have assets grown, and in which funds?', wide: true, sub: 'Assets under management at each month end, every month in the data',
+        build(x) {
+          const fs = fundsOf(x.state);
+          return { kind: 'lines', stacked: true, categories: H.MONTHS.map(H.monthLabel), yTick: tickM, yMin: 0,
+            series: fs.map(f => ({ name: f, fill: true, color: x.pal.s[FUNDS.indexOf(f)], values: H.MONTHS.map(m => byKey.get(f + '|' + m).end), fmt: v => H.usdM(v) })),
+            legend: fs.length > 1 ? fs.map(f => ({ name: f, color: x.pal.s[FUNDS.indexOf(f)] })) : null,
+            tipTitle: i => H.monthLong(H.MONTHS[i]), tipExtra: i => fs.length > 1 ? ['Total ' + H.usdM(aumAt(x.state, H.MONTHS[i]))] : [] };
+        }
+      },
+      {
+        title: 'Are clients adding or withdrawing money?', sub: 'Net flows each month, US$ millions, every month in the data',
+        build(x) {
+          const g = H.group(rowsFor(x.state), 'month'), v = H.MONTHS.map(m => H.sum(g.get(m), 'flow'));
+          return { kind: 'bars', categories: H.MONTHS.map(H.monthLabel), yTick: tickM,
+            series: [{ name: 'Net flows', values: v, color: x.pal.pos, colors: v.map(z => z >= 0 ? x.pal.pos : x.pal.neg), fmt: z => (z >= 0 ? '+' : '') + H.usdM(z) }],
+            legend: [{ name: 'Inflows', color: x.pal.pos }, { name: 'Outflows', color: x.pal.neg }], tipTitle: i => H.monthLong(H.MONTHS[i]) };
+        }
+      },
+      {
+        title: 'Is it beating the benchmark?', sub: x => 'Growth of $100 over ' + H.rangeText(x.P.cur) + (x.state.fund === 'All' ? ', all funds weighted by size' : ''),
+        build(x) {
+          const ms = H.monthsIn(x.P.cur), fs = fundsOf(x.state);
+          let g = 100, b = 100; const gv = [], bv = [];
+          for (const m of ms) {
+            let w = 0, rr = 0, bb = 0;
+            for (const f of fs) { const r = byKey.get(f + '|' + m); w += r.start; rr += r.start * r.ret / 100; bb += r.start * r.bench / 100; }
+            g *= 1 + rr / w; b *= 1 + bb / w; gv.push(g); bv.push(b);
+          }
+          return { kind: 'lines', categories: ms.map(H.monthLabel), yTick: v => '$' + v.toFixed(0),
+            series: [{ name: x.state.fund === 'All' ? 'Our funds' : x.state.fund, values: gv, color: x.pal.s[0], fmt: v => '$' + v.toFixed(2) },
+              { name: 'Benchmark', values: bv, color: x.pal.grey, dash: true, fmt: v => '$' + v.toFixed(2) }], tipTitle: i => H.monthLong(ms[i]) };
+        }
+      },
+      {
+        title: 'Who are our clients?', sub: 'Share of assets by client type, Sep 2026',
+        build(x) {
+          const rows = inv(x.state), g = H.group(rows, 'itype');
+          return { kind: 'donut', items: ITYPES.map((t, i) => ({ label: t, value: g.has(t) ? H.sum(g.get(t), 'now') : 0, color: x.pal.s[i] })),
+            format: v => H.usdM(v), valueName: 'Assets', centerValue: H.usdM(H.sum(rows, 'now')), centerLabel: rows.length + ' holdings' };
+        }
+      },
+      {
+        title: 'Where does the money come from?', sub: 'Assets by client region, Sep 2026',
+        build(x) {
+          const g = H.group(inv(x.state), 'region');
+          const rs = REGIONS.filter(r => g.has(r)).map(r => ({ r, now: H.sum(g.get(r), 'now'), old: H.sum(g.get(r), 'old') })).sort((a, b) => b.now - a.now);
+          return { kind: 'hbars', categories: rs.map(z => z.r), xTick: tickM, height: Math.max(140, rs.length * 28 + 30),
+            series: [{ name: 'Assets', values: rs.map(z => z.now), color: x.pal.s[2], fmt: v => H.usdM(v) }],
+            tipExtra: i => rs[i].old ? ['12-month change ' + H.sign(rs[i].now / rs[i].old - 1) + H.pct(Math.abs(rs[i].now / rs[i].old - 1))] : [] };
+        }
+      },
+      {
+        title: 'How quickly could we pay out redemptions?', wide: true, height: 240, sub: 'Share of assets by dealing terms, Sep 2026',
+        build(x) {
+          const fs = fundsOf(x.state), tot = fs.reduce((t, f) => t + aumAt({ fund: f }, LATEST), 0);
+          const v = LIQ_BUCKETS.map((_, k) => fs.reduce((t, f) => t + aumAt({ fund: f }, LATEST) * LIQ[f][k], 0) / tot);
+          return { kind: 'bars', categories: LIQ_BUCKETS, yTick: v => Math.round(v * 100) + '%',
+            series: [{ name: 'Share of assets', values: v, color: x.pal.s[0], fmt: z => H.pct(z, 0) }],
+            tipExtra: i => [H.usdM(v[i] * tot)] };
+        }
+      }
+    ],
+    table(x) {
+      const rows = inv(x.state).filter(r => r.now < r.old).sort((a, b) => (a.now - a.old) - (b.now - b.old)).slice(0, 12);
+      return {
+        sub: 'Clients who reduced their holding between Sep 2025 and Sep 2026, largest withdrawals first. These figures ignore the period filter.',
+        columns: [{ label: 'Client' }, { label: 'Type' }, { label: 'Region' }, { label: 'Fund' }, { label: 'Sep 2025', num: true }, { label: 'Sep 2026', num: true }, { label: 'Change', num: true }],
+        rows: rows.map(r => { const ch = r.now / r.old - 1; return [r.client, r.itype, r.region, r.fund, H.usdM(r.old), H.usdM(r.now),
+          { t: r.now === 0 ? 'Fully redeemed' : H.MINUS + H.pct(Math.abs(ch), 0), tone: ch < -0.2 ? 'neg' : '' }]; }),
+        empty: 'No client in this selection reduced their holding.'
+      };
+    }
+  };
+})();
+
+(function () {
+  const C = window.DASH_CONFIG, H = window.H;
+  const state = { period: 'Last 12 months' };
+  C.filters.forEach(f => { state[f.key] = 'All'; });
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function palette() {
+    const cs = getComputedStyle(document.documentElement);
+    const v = n => cs.getPropertyValue(n).trim();
+    return { s: [1, 2, 3, 4, 5, 6, 7, 8].map(i => v('--s' + i)), soft: v('--s1-soft'), ink: v('--ink'), muted: v('--muted'),
+      rule: v('--rule'), surface: v('--surface'), pos: v('--pos'), neg: v('--neg'), grey: v('--grey') };
+  }
+
+  // Filters
+  const fwrap = document.getElementById('filters');
+  const all = [{ key: 'period', label: 'Period', options: Object.keys(H.PERIODS), noAll: true }].concat(C.filters);
+  const selects = {};
+  all.forEach(f => {
+    const id = 'f-' + f.key;
+    const wrap = document.createElement('div'); wrap.className = 'field';
+    const lab = document.createElement('label'); lab.htmlFor = id; lab.textContent = f.label;
+    const sel = document.createElement('select'); sel.id = id;
+    if (!f.noAll) sel.add(new Option(f.all, 'All'));
+    f.options.forEach(o => sel.add(new Option(o, o)));
+    sel.value = state[f.key];
+    sel.addEventListener('change', () => { state[f.key] = sel.value; update(true); });
+    selects[f.key] = sel;
+    wrap.append(lab, sel); fwrap.append(wrap);
+  });
+  const reset = document.createElement('button'); reset.type = 'button'; reset.className = 'reset'; reset.textContent = 'Reset filters';
+  reset.addEventListener('click', () => {
+    state.period = 'Last 12 months'; C.filters.forEach(f => { state[f.key] = 'All'; });
+    Object.keys(selects).forEach(k => { selects[k].value = state[k]; });
+    update(true);
+  });
+  fwrap.append(reset);
+
+  // Chart panels
+  const grid = document.getElementById('charts');
+  const panels = C.charts.map(c => {
+    const sec = document.createElement('section'); sec.className = 'panel' + (c.wide ? ' wide' : '');
+    const h = document.createElement('h3'); h.textContent = c.title;
+    const sub = document.createElement('p'); sub.className = 'sub';
+    const lg = document.createElement('div'); lg.className = 'legend';
+    const plot = document.createElement('div'); plot.className = 'plot'; plot.style.height = (c.height || (c.wide ? 300 : 260)) + 'px';
+    sec.append(h, sub, lg, plot); grid.append(sec);
+    return { c, sub, lg, plot, spec: null, w: 0 };
+  });
+
+  const finding = document.getElementById('finding'), notes = document.getElementById('notes');
+  const kpiWrap = document.getElementById('kpis');
+  const table = document.getElementById('table'), tableSub = document.getElementById('table-sub');
+
+  function renderFinding(f) {
+    finding.textContent = f.main;
+    notes.innerHTML = '';
+    (f.subs || []).forEach(s => { const li = document.createElement('li'); li.textContent = s; notes.append(li); });
+  }
+  function renderKpis(list) {
+    kpiWrap.innerHTML = '';
+    kpiWrap.style.setProperty('--n', list.length);
+    list.forEach(k => {
+      const d = document.createElement('div'); d.className = 'kpi';
+      const v = document.createElement('p'); v.className = 'value'; v.textContent = k.value;
+      const l = document.createElement('p'); l.className = 'label'; l.textContent = k.label;
+      const n = document.createElement('p'); n.className = 'note ' + (k.tone || ''); n.textContent = k.note || '\u00a0';
+      d.append(l, v, n); kpiWrap.append(d);
+    });
+  }
+  function renderTable(t) {
+    tableSub.textContent = t.sub || '';
+    table.innerHTML = '';
+    const thead = table.createTHead(), hr = thead.insertRow();
+    t.columns.forEach(c => { const th = document.createElement('th'); th.scope = 'col'; th.textContent = c.label; if (c.num) th.className = 'num'; hr.append(th); });
+    const tb = table.createTBody();
+    if (!t.rows.length) {
+      const r = tb.insertRow(), td = r.insertCell(); td.colSpan = t.columns.length; td.className = 'empty'; td.textContent = t.empty || 'No rows match these filters.';
+      return;
+    }
+    t.rows.forEach(row => {
+      const r = tb.insertRow();
+      row.forEach((cell, i) => {
+        const td = r.insertCell();
+        const o = (cell && typeof cell === 'object') ? cell : { t: cell };
+        td.textContent = o.t;
+        td.className = [t.columns[i].num ? 'num' : '', o.tone || ''].join(' ').trim();
+      });
+    });
+  }
+  function drawPanel(p, pal) {
+    if (!p.spec) return;
+    Charts.render(p.plot, p.lg, p.spec, pal);
+    p.w = p.plot.clientWidth;
+  }
+  function update(animate) {
+    const x = { state, P: H.PERIODS[state.period], pal: palette() };
+    if (animate && !reduceMotion) {
+      finding.parentElement.classList.remove('flash'); void finding.offsetWidth; finding.parentElement.classList.add('flash');
+    }
+    renderFinding(C.headline(x));
+    renderKpis(C.kpis(x));
+    panels.forEach(p => {
+      p.sub.textContent = typeof p.c.sub === 'function' ? p.c.sub(x) : (p.c.sub || '');
+      p.spec = p.c.build(x);
+      drawPanel(p, x.pal);
+    });
+    renderTable(C.table(x));
+  }
+
+  let raf = 0;
+  const ro = new ResizeObserver(() => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      const pal = palette();
+      panels.forEach(p => { if (p.plot.clientWidth !== p.w) drawPanel(p, pal); });
+    });
+  });
+  panels.forEach(p => ro.observe(p.plot));
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => update(false));
+  window.DASH_API = {
+    setFilters(obj) {
+      Object.entries(obj).forEach(([k, v]) => {
+        if (selects[k] && [...selects[k].options].some(o => o.value === v)) { state[k] = v; selects[k].value = v; }
+      });
+      update(true);
+      document.getElementById('finding').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+    }
+  };
+  update(false);
+})();
+
+</script>
+</body>
+</html>

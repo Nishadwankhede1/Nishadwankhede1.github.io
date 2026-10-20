@@ -1,0 +1,147 @@
+client,investor_type,region,fund,holding_sep_2025_usd_m,holding_sep_2026_usd_m
+Client 001,Sovereign & pension,UAE,Global Equity,47.57,82.55
+Client 002,Wealth platform,Qatar,Global Equity,20.81,34.74
+Client 003,Private bank,Asia,Global Equity,31.04,55.93
+Client 004,Private bank,Kuwait,Global Equity,29.44,44.72
+Client 005,Insurance,Bahrain & Oman,Global Equity,46.58,72.53
+Client 006,Insurance,UAE,Global Equity,60.91,93.11
+Client 007,Family office,Saudi Arabia,Global Equity,17.67,26.76
+Client 008,Family office,Saudi Arabia,Global Equity,14.93,9.31
+Client 009,Wealth platform,UAE,Global Equity,50.62,77.61
+Client 010,Sovereign & pension,Europe,Global Equity,52.73,75.02
+Client 011,Wealth platform,Europe,Global Equity,17.21,29.49
+Client 012,Private bank,Saudi Arabia,Global Equity,40.66,42.41
+Client 013,Private bank,Europe,Global Equity,17.64,27.16
+Client 014,Wealth platform,Qatar,Global Equity,52.64,89.38
+Client 015,Wealth platform,Europe,Global Equity,15.21,11.17
+Client 016,Family office,UAE,Global Equity,12.88,17.56
+Client 017,Sovereign & pension,Saudi Arabia,Global Equity,49.49,70.59
+Client 018,Private bank,Kuwait,Global Equity,41.68,72.58
+Client 019,Private bank,Europe,Global Equity,29.41,26.49
+Client 020,Family office,Europe,Global Equity,13.63,19.91
+Client 021,Wealth platform,Saudi Arabia,Global Equity,54.75,46.59
+Client 022,Family office,Europe,Global Equity,12.85,22.26
+Client 023,Wealth platform,UAE,Global Equity,18.77,26.69
+Client 024,Wealth platform,UAE,Global Equity,41.98,30.32
+Client 025,Wealth platform,Kuwait,Global Equity,46.39,42.24
+Client 026,Wealth platform,Kuwait,Global Equity,52.14,55.13
+Client 027,Private bank,UAE,Global Equity,20.44,30.11
+Client 028,Family office,UAE,Global Equity,11.58,21.01
+Client 029,Wealth platform,Europe,Global Equity,40.23,61.29
+Client 030,Private bank,UAE,Global Equity,43.8,68.36
+Client 031,Private bank,Kuwait,Global Equity,25.51,43.09
+Client 032,Wealth platform,UAE,Global Equity,11.95,16.27
+Client 033,Family office,UAE,Global Equity,16.83,27.66
+Client 034,Wealth platform,Saudi Arabia,Global Equity,46.56,69.02
+Client 035,Private bank,UAE,Global Equity,32.66,48.19
+Client 036,Family office,Asia,Global Equity,16.09,25.16
+Client 037,Private bank,Saudi Arabia,Global Equity,29.42,50.61
+Client 038,Private bank,Bahrain & Oman,Global Equity,41.11,54.99
+Client 039,Private bank,Kuwait,MENA Equity,39.97,53.39
+Client 040,Wealth platform,Saudi Arabia,MENA Equity,28.78,0.0
+Client 041,Family office,Europe,MENA Equity,22.99,41.87
+Client 042,Wealth platform,Saudi Arabia,MENA Equity,48.71,84.36
+Client 043,Private bank,Asia,MENA Equity,17.73,31.31
+Client 044,Family office,UAE,MENA Equity,4.47,8.58
+Client 045,Private bank,UAE,MENA Equity,6.0,12.87
+Client 046,Family office,UAE,MENA Equity,9.07,8.77
+Client 047,Private bank,UAE,MENA Equity,19.61,0.0
+Client 048,Private bank,UAE,MENA Equity,40.18,74.35
+Client 049,Family office,Europe,MENA Equity,23.79,18.24
+Client 050,Private bank,Saudi Arabia,MENA Equity,19.56,34.95
+Client 051,Wealth platform,UAE,MENA Equity,11.78,23.59
+Client 052,Wealth platform,Saudi Arabia,MENA Equity,27.79,49.75
+Client 053,Private bank,Asia,MENA Equity,10.6,22.01
+Client 054,Private bank,Kuwait,MENA Equity,42.42,68.42
+Client 055,Private bank,UAE,MENA Equity,15.34,30.34
+Client 056,Wealth platform,UAE,MENA Equity,11.04,17.8
+Client 057,Wealth platform,Saudi Arabia,MENA Equity,16.73,36.34
+Client 058,Private bank,UAE,MENA Equity,24.81,48.8
+Client 059,Family office,Europe,MENA Equity,15.53,32.94
+Client 060,Wealth platform,Asia,MENA Equity,38.7,0.0
+Client 061,Private bank,Kuwait,MENA Equity,16.57,32.93
+Client 062,Private bank,Bahrain & Oman,MENA Equity,18.25,40.21
+Client 063,Family office,Saudi Arabia,MENA Equity,12.07,0.0
+Client 064,Private bank,UAE,MENA Equity,43.79,0.0
+Client 065,Private bank,Europe,MENA Equity,12.29,24.56
+Client 066,Private bank,UAE,MENA Equity,22.06,14.3
+Client 067,Corporate treasury,Saudi Arabia,Sukuk & Fixed Income,26.9,28.45
+Client 068,Corporate treasury,Saudi Arabia,Sukuk & Fixed Income,28.9,36.66
+Client 069,Corporate treasury,Asia,Sukuk & Fixed Income,9.08,4.87
+Client 070,Corporate treasury,Kuwait,Sukuk & Fixed Income,13.62,16.23
+Client 071,Corporate treasury,UAE,Sukuk & Fixed Income,12.54,14.17
+Client 072,Sovereign & pension,Saudi Arabia,Sukuk & Fixed Income,124.1,159.51
+Client 073,Insurance,Bahrain & Oman,Sukuk & Fixed Income,53.04,52.98
+Client 074,Insurance,Qatar,Sukuk & Fixed Income,46.67,54.53
+Client 075,Insurance,UAE,Sukuk & Fixed Income,56.95,74.88
+Client 076,Sovereign & pension,Kuwait,Sukuk & Fixed Income,74.99,90.77
+Client 077,Corporate treasury,Saudi Arabia,Sukuk & Fixed Income,23.33,16.64
+Client 078,Corporate treasury,UAE,Sukuk & Fixed Income,17.41,16.97
+Client 079,Sovereign & pension,UAE,Sukuk & Fixed Income,78.31,96.29
+Client 080,Sovereign & pension,Saudi Arabia,Sukuk & Fixed Income,65.17,85.24
+Client 081,Private bank,Europe,Sukuk & Fixed Income,24.29,26.97
+Client 082,Corporate treasury,UAE,Sukuk & Fixed Income,14.39,7.76
+Client 083,Insurance,UAE,Sukuk & Fixed Income,57.11,61.55
+Client 084,Private bank,Saudi Arabia,Sukuk & Fixed Income,29.71,30.2
+Client 085,Corporate treasury,UAE,Sukuk & Fixed Income,15.09,17.77
+Client 086,Insurance,Kuwait,Sukuk & Fixed Income,57.65,62.91
+Client 087,Insurance,UAE,Sukuk & Fixed Income,38.66,14.85
+Client 088,Corporate treasury,UAE,Sukuk & Fixed Income,24.37,26.97
+Client 089,Insurance,UAE,Sukuk & Fixed Income,25.92,25.74
+Client 090,Private bank,Saudi Arabia,Sukuk & Fixed Income,32.23,41.29
+Client 091,Corporate treasury,Europe,Sukuk & Fixed Income,12.85,15.73
+Client 092,Insurance,Europe,Sukuk & Fixed Income,30.59,34.72
+Client 093,Corporate treasury,UAE,Sukuk & Fixed Income,12.03,13.14
+Client 094,Corporate treasury,UAE,Sukuk & Fixed Income,4.89,5.03
+Client 095,Insurance,UAE,Sukuk & Fixed Income,16.53,16.97
+Client 096,Private bank,UAE,Sukuk & Fixed Income,31.27,38.01
+Client 097,Insurance,Bahrain & Oman,Sukuk & Fixed Income,30.29,39.82
+Client 098,Insurance,Kuwait,Sukuk & Fixed Income,46.39,49.57
+Client 099,Corporate treasury,UAE,Sukuk & Fixed Income,6.4,6.18
+Client 100,Insurance,Asia,Sukuk & Fixed Income,31.87,16.33
+Client 101,Insurance,UAE,Multi-Asset Balanced,26.84,30.85
+Client 102,Private bank,Europe,Multi-Asset Balanced,35.56,35.76
+Client 103,Wealth platform,Saudi Arabia,Multi-Asset Balanced,40.23,36.54
+Client 104,Private bank,Asia,Multi-Asset Balanced,15.61,16.19
+Client 105,Private bank,Bahrain & Oman,Multi-Asset Balanced,16.25,14.54
+Client 106,Family office,UAE,Multi-Asset Balanced,11.23,5.02
+Client 107,Wealth platform,Saudi Arabia,Multi-Asset Balanced,34.21,39.09
+Client 108,Family office,Asia,Multi-Asset Balanced,4.14,4.36
+Client 109,Family office,Saudi Arabia,Multi-Asset Balanced,15.18,16.68
+Client 110,Family office,UAE,Multi-Asset Balanced,5.32,5.28
+Client 111,Private bank,Kuwait,Multi-Asset Balanced,35.62,32.23
+Client 112,Wealth platform,Saudi Arabia,Multi-Asset Balanced,32.35,33.84
+Client 113,Private bank,Asia,Multi-Asset Balanced,6.26,5.74
+Client 114,Wealth platform,Kuwait,Multi-Asset Balanced,38.45,42.94
+Client 115,Private bank,UAE,Multi-Asset Balanced,33.44,35.66
+Client 116,Private bank,Saudi Arabia,Multi-Asset Balanced,31.84,34.35
+Client 117,Private bank,Bahrain & Oman,Multi-Asset Balanced,23.01,23.17
+Client 118,Wealth platform,Europe,Multi-Asset Balanced,36.5,41.22
+Client 119,Private bank,UAE,Multi-Asset Balanced,35.52,10.32
+Client 120,Wealth platform,Kuwait,Multi-Asset Balanced,24.79,23.22
+Client 121,Family office,UAE,Multi-Asset Balanced,10.91,12.27
+Client 122,Private bank,UAE,Multi-Asset Balanced,35.4,38.3
+Client 123,Wealth platform,Bahrain & Oman,Multi-Asset Balanced,15.96,9.64
+Client 124,Private bank,UAE,Multi-Asset Balanced,28.09,0.0
+Client 125,Private bank,Saudi Arabia,Multi-Asset Balanced,31.47,31.08
+Client 126,Wealth platform,UAE,Multi-Asset Balanced,18.69,17.9
+Client 127,Wealth platform,Europe,Multi-Asset Balanced,25.89,29.96
+Client 128,Wealth platform,UAE,Multi-Asset Balanced,19.22,18.24
+Client 129,Private bank,UAE,Multi-Asset Balanced,27.38,13.75
+Client 130,Family office,Asia,Multi-Asset Balanced,4.06,4.27
+Client 131,Sovereign & pension,UAE,Private Credit,38.27,54.3
+Client 132,Sovereign & pension,Qatar,Private Credit,55.44,75.3
+Client 133,Sovereign & pension,UAE,Private Credit,87.81,108.14
+Client 134,Family office,Kuwait,Private Credit,9.61,11.78
+Client 135,Insurance,Kuwait,Private Credit,23.87,36.27
+Client 136,Family office,Saudi Arabia,Private Credit,14.09,21.07
+Client 137,Insurance,Saudi Arabia,Private Credit,15.37,22.9
+Client 138,Insurance,Bahrain & Oman,Private Credit,28.38,36.61
+Client 139,Family office,Europe,Private Credit,4.72,5.63
+Client 140,Family office,Europe,Private Credit,13.81,17.37
+Client 141,Sovereign & pension,Saudi Arabia,Private Credit,34.21,48.59
+Client 142,Sovereign & pension,UAE,Private Credit,69.38,108.91
+Client 143,Family office,Saudi Arabia,Private Credit,2.06,3.03
+Client 144,Sovereign & pension,Qatar,Private Credit,80.16,113.59
+Client 145,Sovereign & pension,Europe,Private Credit,72.78,100.24
+Client 146,Insurance,Bahrain & Oman,Private Credit,24.9,35.12
