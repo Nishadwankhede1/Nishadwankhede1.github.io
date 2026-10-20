@@ -1,1 +1,25 @@
 WEBVTT
+
+1
+00:00:00.500 --> 00:00:13.500
+Welcome to Shelf and Sales, an enterprise FMCG sell-out intelligence dashboard built in Power BI for the UAE market. It models 1.6 billion AED in net sales across seven major retail channels and 30 million cases sold.
+
+2
+00:00:13.500 --> 00:00:26.500
+The executive overview tracks high-level KPIs, including gross margin at 25.6%, promotional share, and retail on-shelf availability at 94.8%.
+
+3
+00:00:26.500 --> 00:00:39.500
+An automated DAX narrative headline dynamically highlights key market drivers, identifying online grocery as the fastest-growing channel while hypermarkets drive promotional volume.
+
+4
+00:00:39.500 --> 00:00:52.000
+Monthly trend charts capture critical seasonal shifts, including Ramadan demand peaks and summer patterns, alongside product category mix across snacks, beverages, dairy, and personal care.
+
+5
+00:00:52.000 --> 00:01:03.500
+Through dynamic calculation groups, commercial teams can switch metrics on demand, comparing gross margins against trade promotion intensity across each channel and emirate.
+
+6
+00:01:03.500 --> 00:01:14.200
+The AI Insights page utilizes a decomposition tree visual, empowering commercial managers to perform root-cause analysis on net sales drivers over an enterprise star-schema data model.
