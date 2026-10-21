@@ -1,6 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
+<script>
+(function(){
+  try{
+    var t=localStorage.getItem('nw-theme')||'dark';
+    document.documentElement.setAttribute('data-theme',t);
+  }catch(e){
+    document.documentElement.setAttribute('data-theme','dark');
+  }
+})();
+</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Nishad Wankhede · Business Intelligence Analyst</title>
@@ -17,18 +27,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fafaf7; --surface:#ffffff; --surface-2:#f3f3ee; --text:#14161b; --muted:#5a616e; --faint:#8b919c;
+  --bg:#fafaf7; --surface:#ffffff; --surface-2:#f3f3ee; --text:#14161b; --muted:#5a616e; --faint:#666e7b;
   --border:#e5e5df; --accent:#2846c9; --accent-soft:#e8ecfb; --good:#127a52; --good-soft:#e3f4ec; --warn:#b4471f;
   --shadow:0 1px 2px rgba(20,22,27,.04),0 8px 24px rgba(20,22,27,.06);
   --serif:"Instrument Serif",Georgia,serif; --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0f1115; --surface:#161920; --surface-2:#1c2029; --text:#e9ebf0; --muted:#a3a9b6; --faint:#737a88;
+  --bg:#0f1115; --surface:#161920; --surface-2:#1c2029; --text:#e9ebf0; --muted:#a3a9b6; --faint:#9aa2b1;
   --border:#272b35; --accent:#8ea4ff; --accent-soft:#1d2440; --good:#4fd1a0; --good-soft:#123227; --warn:#ff9b73;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
 }}
 :root[data-theme="dark"]{
-  --bg:#0f1115; --surface:#161920; --surface-2:#1c2029; --text:#e9ebf0; --muted:#a3a9b6; --faint:#737a88;
+  --bg:#0f1115; --surface:#161920; --surface-2:#1c2029; --text:#e9ebf0; --muted:#a3a9b6; --faint:#9aa2b1;
   --border:#272b35; --accent:#8ea4ff; --accent-soft:#1d2440; --good:#4fd1a0; --good-soft:#123227; --warn:#ff9b73;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
 }
@@ -99,7 +109,7 @@ h1 em{color:var(--accent)}
 @media (max-width:760px){.stats{grid-template-columns:1fr 1fr}.stat:nth-child(2){border-right:0}.stat:nth-child(-n+2){border-bottom:1px solid var(--border)}}
 
 /* sections */
-section{padding:88px 0 0}
+section{padding:88px 0 0;scroll-margin-top:88px}
 @media (max-width:600px){section{padding-top:64px}}
 .sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:30px;flex-wrap:wrap}
 .sec-num{font:500 12.5px var(--mono);color:var(--accent)}
@@ -198,7 +208,14 @@ h2{font:400 clamp(30px,4vw,40px)/1.1 var(--serif);margin:0;letter-spacing:-.01em
 @media (max-width:600px){.scores .bar-row{grid-template-columns:104px 1fr 44px}}
 
 /* case studies */
-.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.cases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:start}
+.case-video{margin-top:18px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:var(--surface-2);box-shadow:var(--shadow)}
+.case-video video{display:block;width:100%;aspect-ratio:16/9;background:#0f1115}
+.case-video-foot{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;border-top:1px solid var(--border);background:var(--surface)}
+.case-video-tag{color:var(--muted);font-family:var(--mono);display:inline-flex;align-items:center;gap:6px}
+.case-video-tag .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--good)}
+.case-video-link{color:var(--accent);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px}
+.case-video-link:hover{text-decoration:underline}
 @media (max-width:900px){.cases{grid-template-columns:1fr}}
 .case{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:24px}
 .case .metric{display:flex;align-items:center;gap:14px;min-height:72px;box-sizing:content-box;padding-bottom:16px;border-bottom:1px solid var(--border)}
@@ -288,9 +305,9 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
     <div class="rv">
       <div class="eyebrow"><span class="dot" aria-hidden="true"></span>Open to BI &amp; data roles <span aria-hidden="true">·</span> Dubai, UAE</div>
       <h1>I turn financial and CRM data into <em>decisions leaders act on.</em></h1>
-      <p class="lede">Business Intelligence Analyst with 3.5+ years in asset management and financial data, most recently at Russell Investments. I build the dashboards, data models and automated reporting that executives actually use, in Power BI, SQL, Snowflake, Microsoft Fabric and Python.</p>
+      <p class="lede">Business Intelligence Analyst with 3.5+ years in asset management and financial data. I build executive dashboards, deliver cloud migrations and automate CEO/COO reporting with Power BI, SQL, Snowflake, Azure, Microsoft Fabric and Python.</p>
       <div class="cta">
-        <a class="btn primary" href="#contact"><svg><use href="#i-mail"/></svg>Get in touch</a>
+        <a class="btn primary" href="#uae-dashboards"><svg><use href="#i-chart"/></svg>Explore dashboards</a>
         <a class="btn" href="Nishad_Wankhede_CV.pdf" download><svg><use href="#i-dl"/></svg>Download CV</a>
       </div>
       <div class="social">
@@ -307,13 +324,9 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
         <div class="bar-row"><span>Before</span><div class="bar"><i data-w="80" style="background:var(--warn);opacity:.75"></i></div><b>40%</b></div>
         <div class="bar-row"><span>After</span><div class="bar"><i data-w="38" style="background:var(--good)"></i></div><b>&lt;20%</b></div>
       </div>
-      <svg class="spark" viewBox="0 0 300 56" preserveAspectRatio="none" aria-hidden="true">
-        <path class="area" d="M0 44 L30 40 L60 42 L90 34 L120 36 L150 28 L180 30 L210 22 L240 20 L270 14 L300 10 L300 56 L0 56Z"/>
-        <path class="line" d="M0 44 L30 40 L60 42 L90 34 L120 36 L150 28 L180 30 L210 22 L240 20 L270 14 L300 10"/>
-      </svg>
       <div class="kpi-split">
         <div class="mini"><b>15+</b><span>business units on my Power BI reports</span></div>
-        <div class="mini"><b>99%</b><span>data accuracy kept through schema audits</span></div>
+        <div class="mini"><b>99%</b><span>data accuracy maintained through schema audits and user surveys</span></div>
       </div>
     </aside>
   </header>
@@ -329,13 +342,13 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
     <div class="sec-head rv"><span class="sec-num">01</span><h2>About</h2></div>
     <div class="about">
       <div class="rv">
-        <p>I'm a data professional who sits between the numbers and the people who make decisions with them. At <strong>Russell Investments</strong> I led the move from Dynamics 365 to Salesforce and from SQL Server to Snowflake, and automated the CEO and COO reporting so nobody had to build decks by hand again.</p>
-        <p>Before that, at <strong>Morningstar (PitchBook)</strong>, I halved sales forecast error with regression models and built Power BI reporting used across 15+ business units.</p>
-        <p>Outside work I build things: <strong>JobRadar</strong>, an automated system that watches hundreds of employers' career sites, scores every vacancy and sends alerts within minutes. I'm completing a Master's in Information Systems, Data Management and AI for Business at Middlesex University Dubai, and researching <strong>data lineage through stored procedures</strong>, so legacy databases can be migrated without guesswork.</p>
+        <p>My experience spans <strong>Russell Investments</strong> and <strong>Morningstar India (PitchBook)</strong>, with a focus on executive reporting, financial analytics and CRM data migrations. I combine hands-on data work with stakeholder management, data quality and governance.</p>
+        <p>I'm based in <strong>Dubai</strong>, available immediately, and completing a Master's in Information Systems and Data Management and AI for Business at <strong>Middlesex University Dubai</strong>.</p>
+        <p>Explore my dashboards below for examples of data modelling and reporting. My independent projects also cover Python automation and data lineage.</p>
       </div>
       <dl class="facts rv">
         <div><dt>Based in</dt><dd>Dubai, UAE</dd></div>
-        <div><dt>Focus</dt><dd>BI, analytics engineering, CRM data</dd></div>
+        <div><dt>Focus</dt><dd>BI, executive reporting, CRM data</dd></div>
         <div><dt>Industry</dt><dd>Asset management, financial data</dd></div>
         <div><dt>Core stack</dt><dd>Power BI · SQL · Snowflake · Fabric</dd></div>
         <div><dt>Languages</dt><dd>English, Hindi</dd></div>
@@ -369,7 +382,8 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
             <li>Improved sales forecast accuracy by <b>50%</b> with predictive regression models, cutting error from 40% to under 20%.</li>
             <li>Delivered Power BI reporting adopted by <b>15+ business units</b> and 2,000+ employees.</li>
             <li>Deployed 15+ automated alerts, cutting weekly QA time from <b>15 to 5 hours</b>.</li>
-            <li>Cut reporting processing time by <b>30%</b> by automating pipelines with GitLab CI/CD; kept 99% data accuracy through schema audits.</li>
+            <li>Cut reporting processing time by <b>30%</b> by automating pipelines with GitLab CI/CD.</li>
+            <li>Maintained <b>99% data accuracy</b> through schema audits and user surveys.</li>
           </ul>
           <div class="chips"><span class="chip">Power BI</span><span class="chip">SQL Server</span><span class="chip">Regression</span><span class="chip">GitLab CI/CD</span></div>
         </div>
@@ -379,17 +393,18 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
         <div>
           <h3>Power BI Developer Intern</h3><div class="org">iNeuron.ai</div>
           <ul>
-            <li>Built Power BI dashboards tracking 10+ KPIs for leadership, and improved data usability by 20% with Python and SQL cleaning scripts.</li>
+            <li>Built Power BI dashboards tracking <b>10+ KPIs</b> for leadership reporting.</li>
+            <li>Improved data usability by <b>20%</b> with Python and SQL cleaning and modelling scripts.</li>
           </ul>
         </div>
       </article>
     </div>
   </section>
 
-  <section id="projects">
+  <section id="projects" aria-label="Independent portfolio projects">
     <div class="sec-head rv"><span class="sec-num">03</span><h2>Projects</h2></div>
 
-<div class="uaep" id="uae-dashboards">
+<div class="uaep" id="uae-dashboards" style="scroll-margin-top:88px">
   <style>
     .uaep { --uaep-line: color-mix(in srgb, currentColor 15%, transparent); --uaep-soft: color-mix(in srgb, currentColor 62%, transparent);
       --uaep-panel: color-mix(in srgb, currentColor 3.5%, transparent); --uaep-accent: #0f6b5c; margin: 0 0 64px; }
@@ -450,7 +465,7 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
     <div>
       <p class="uaep-meta">New · Power BI · Data modelling</p>
       <h3 class="uaep-title">UAE industry dashboards</h3>
-      <p class="uaep-lede">Four interactive dashboards for UAE industries, built on synthetic data. Each one opens with the finding a manager needs first, written from the data, and rewrites it as the filters change. The DIFC fund house is also built as a Power BI report, with a star-schema model and a call list of clients who are pulling money out.</p>
+      <p class="uaep-lede">Explore four UAE industry dashboards built on synthetic data. Filter the reports to see how the findings change. The DIFC fund house includes a Power BI report, a star-schema model and a client outflow call list.</p>
       <dl class="uaep-stats">
         <div><dt>4</dt><dd>UAE industries</dd></div>
         <div><dt>23</dt><dd>DAX measures</dd></div>
@@ -593,6 +608,15 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
         <dl><div><dt>Challenge</dt><dd>Move client and sales data off Dynamics 365 and SQL Server without breaking the reports that sales relied on.</dd></div>
         <div><dt>Approach</dt><dd>Led the Dynamics 365 → Salesforce and SQL Server → Snowflake migrations on Azure, and embedded Power BI inside Salesforce.</dd></div>
         <div><dt>Result</dt><dd>Data-driven client tracking, built with regional sales directors, lifted institutional client retention by 10%.</dd></div></dl>
+        <div class="case-video">
+          <video id="migration-video" controls playsinline preload="metadata" poster="videos/data-platform-migration-dark-poster.png" data-theme="dark">
+            <source src="videos/data-platform-migration-dark.mp4" type="video/mp4">
+          </video>
+          <div class="case-video-foot">
+            <span class="case-video-tag"><span class="dot" aria-hidden="true"></span>2:00 &middot; Architecture walkthrough</span>
+            <a class="case-video-link" id="migration-interactive-link" href="data-platform-migration.html?render=dark" target="_blank" rel="noopener">Interactive diagram &rarr;</a>
+          </div>
+        </div>
       </article>
       <article class="case rv">
         <div class="metric"><span class="ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 14h6l-1 7 8-11h-6l1-7z"/></svg></span><div><div class="ba"><s>Manual decks</s><span class="to">→</span><span style="color:var(--accent)">Automated</span></div><span class="cap">CEO, COO &amp; board reporting</span></div></div>
@@ -631,7 +655,7 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
         <div class="cred"><span class="ic"><svg><use href="#i-badge"/></svg></span><div><b>SQL (Advanced) · 5-Star SQL Coder</b><span>HackerRank</span></div></div>
       </div>
       <div class="cred-list rv">
-        <div class="cred"><span class="ic"><svg><use href="#i-cap"/></svg></span><div><b>Master's, Information Systems &amp; Data Management and AI for Business</b><span>Middlesex University Dubai · in progress</span></div></div>
+        <div class="cred"><span class="ic"><svg><use href="#i-cap"/></svg></span><div><b>Master's, Information Systems and Data Management and AI for Business</b><span>Middlesex University Dubai · in progress</span></div></div>
         <div class="cred"><span class="ic"><svg><use href="#i-cap"/></svg></span><div><b>Bachelor of Engineering, Civil Engineering</b><span>K. K. Wagh Institute of Engineering Education and Research · 2017–2021</span></div></div>
       </div>
     </div>
@@ -640,7 +664,7 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
   <div class="contact rv" id="contact">
     <div>
       <h2>Let's talk about your data.</h2>
-      <p>I'm open to Business Intelligence, analytics and CRM-data roles in the UAE, and to relocation for the right team. The fastest way to reach me is by email.</p>
+      <p>Based in Dubai and available immediately for Business Intelligence roles. My experience covers executive dashboards, financial analytics, cloud migrations and automated reporting. The fastest way to reach me is by email.</p>
     </div>
     <div class="stack">
       <a class="btn primary" href="mailto:nishadwankhede1@gmail.com"><span style="display:inline-flex;gap:8px;align-items:center"><svg><use href="#i-mail"/></svg>nishadwankhede1@gmail.com</span><svg><use href="#i-arrow"/></svg></a>
@@ -659,11 +683,40 @@ footer.wrap{padding-top:36px;padding-bottom:44px;color:var(--faint);font-size:13
 (function(){
   var root=document.documentElement, btn=document.getElementById('theme');
   function stored(){try{return localStorage.getItem('nw-theme')}catch(e){return null}}
-  function isDark(){var t=root.getAttribute('data-theme');return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches}
+  function isDark(){var t=root.getAttribute('data-theme');return t?t==='dark':true}
   function icon(){btn.querySelector('use').setAttribute('href',isDark()?'#i-sun':'#i-moon')}
-  var s=stored(); if(s) root.setAttribute('data-theme',s); icon();
-  btn.addEventListener('click',function(){var n=isDark()?'light':'dark';root.setAttribute('data-theme',n);try{localStorage.setItem('nw-theme',n)}catch(e){}icon()});
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',icon);
+  function syncVideoTheme(){
+    var dark=isDark();
+    icon();
+    var video=document.getElementById('migration-video');
+    var link=document.getElementById('migration-interactive-link');
+    if(video){
+      var targetSrc=dark?'videos/data-platform-migration-dark.mp4':'videos/data-platform-migration-light.mp4';
+      var targetPoster=dark?'videos/data-platform-migration-dark-poster.png':'videos/data-platform-migration-light-poster.png';
+      if(video.getAttribute('data-theme')!==(dark?'dark':'light')){
+        var currentTime=video.currentTime;
+        var isPlaying=!video.paused&&!video.ended&&video.readyState>2;
+        video.setAttribute('data-theme',dark?'dark':'light');
+        video.poster=targetPoster;
+        var source=video.querySelector('source');
+        if(source)source.src=targetSrc;
+        video.src=targetSrc;
+        if(currentTime>0)video.currentTime=currentTime;
+        if(isPlaying)video.play().catch(function(){});
+      }
+    }
+    if(link){
+      link.href='data-platform-migration.html?render='+(dark?'dark':'light');
+    }
+  }
+  var s=stored()||'dark'; root.setAttribute('data-theme',s); syncVideoTheme();
+  btn.addEventListener('click',function(){
+    var n=isDark()?'light':'dark';
+    root.setAttribute('data-theme',n);
+    try{localStorage.setItem('nw-theme',n)}catch(e){}
+    syncVideoTheme();
+  });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',syncVideoTheme);
 
   var nav=document.getElementById('nav');
   addEventListener('scroll',function(){nav.classList.toggle('scrolled',scrollY>8)},{passive:true});

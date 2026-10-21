@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script>
+(function() {
+  const p = new URLSearchParams(location.search);
+  const r = p.get('render');
+  if (r) {
+    document.documentElement.classList.add('render');
+    document.documentElement.setAttribute('data-theme', r === 'light' ? 'light' : 'dark');
+  }
+})();
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Data platform migration, explained</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600&family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+@property --n { syntax: '<integer>'; inherits: false; initial-value: 0; }
+:root{
+  --page:#E4EAF2; --bg:#F3F6FA; --panel:#FFFFFF; --panel2:#E9EFF6; --line:#C8D3E1;
+  --text:#14253B; --muted:#55698A;
+  --legacy:#C25E28; --transit:#1D69D4; --target:#0B8F75; --insight:#A97700;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#09131F; --bg:#0F1C2E; --panel:#152740; --panel2:#1B304E; --line:#2A4163;
+    --text:#E8EEF7; --muted:#92A5C1;
+    --legacy:#E88A56; --transit:#5BA3FF; --target:#46D2B2; --insight:#F0C24E;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#09131F; --bg:#0F1C2E; --panel:#152740; --panel2:#1B304E; --line:#2A4163;
+  --text:#E8EEF7; --muted:#92A5C1;
+  --legacy:#E88A56; --transit:#5BA3FF; --target:#46D2B2; --insight:#F0C24E;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--text);font-family:Poppins,"Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1280px;margin:0 auto;padding:28px 20px 48px}
+.frame{position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:14px;background:var(--bg);border:1px solid var(--line);cursor:pointer}
+#stage{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;transform:scale(var(--k,1));color:var(--text);overflow:hidden}
+#stage::before{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--line) 1.1px,transparent 1.2px);background-size:32px 32px;opacity:.45}
+
+/* scenes */
+.scene{position:absolute;inset:0;opacity:0;animation:life var(--len) linear var(--s) both;pointer-events:none}
+.scene.last{animation-name:lifeLast}
+@keyframes life{0%{opacity:0}3%{opacity:1}96%{opacity:1}100%{opacity:0}}
+@keyframes lifeLast{0%{opacity:0}4%{opacity:1}100%{opacity:1}}
+
+/* animation primitives */
+.a{animation-duration:var(--dur,.7s);animation-delay:calc(var(--s) + var(--d,0s));animation-fill-mode:both;animation-timing-function:cubic-bezier(.2,.75,.25,1)}
+.rise{animation-name:rise}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.pop{animation-name:pop}
+@keyframes pop{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:none}}
+.fade{animation-name:fade}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.growx{animation-name:growx;transform-origin:left center}
+@keyframes growx{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.growy{animation-name:growy;transform-origin:center bottom}
+@keyframes growy{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+.draw{stroke-dasharray:1;animation-name:draw;animation-timing-function:cubic-bezier(.45,0,.25,1)}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.type{animation-name:type;animation-timing-function:steps(28,end)}
+@keyframes type{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+.dim{animation-name:dim}
+@keyframes dim{from{opacity:1}to{opacity:.35}}
+svg .a, svg .pop{transform-box:fill-box;transform-origin:center}
+
+.r-legacy{--role:var(--legacy)} .r-transit{--role:var(--transit)} .r-target{--role:var(--target)} .r-insight{--role:var(--insight)} .r-neutral{--role:var(--muted)}
+
+/* wires and packets */
+svg.wires{position:absolute;left:0;top:0;width:1280px;height:720px;overflow:visible}
+.wire{fill:none;stroke:var(--role);stroke-width:2;stroke-linecap:round;opacity:.55}
+.wire.dashed{stroke-dasharray:5 7;opacity:.8}
+.pk{fill:var(--role);animation:travel var(--dur,2.4s) linear infinite;animation-delay:calc(var(--s) + var(--d,0s))}
+@keyframes travel{0%{offset-distance:0%;opacity:0}10%{opacity:1}90%{opacity:1}100%{offset-distance:100%;opacity:0}}
+.spin{animation:spin 20s linear infinite;transform-box:fill-box;transform-origin:center}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* type */
+.t{position:absolute}
+.ttl{left:72px;top:54px;width:1020px;font-family:Lora,Georgia,serif;font-weight:600;font-size:40px;line-height:1.15;letter-spacing:-.005em}
+.cnt{position:absolute;right:72px;top:68px;font-size:15px;color:var(--muted)}
+.cap{position:absolute;left:72px;bottom:46px;width:1040px;font-size:20px;line-height:1.5;color:var(--muted)}
+.hero{font-family:Lora,Georgia,serif;font-weight:600;font-size:66px;line-height:1.06;letter-spacing:-.01em}
+.lead{font-size:22px;line-height:1.5;color:var(--muted)}
+.small{font-size:15px;color:var(--muted)}
+.lbl{font-size:16px;font-weight:500;color:var(--text)}
+.coltag{font-size:15px;color:var(--muted)}
+
+/* nodes */
+.node{position:absolute;background:var(--panel);border:1.5px solid color-mix(in srgb,var(--role) 50%,var(--line));border-radius:12px;padding:12px 16px 12px 24px;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.node::before{content:"";position:absolute;left:9px;top:12px;bottom:12px;width:4px;border-radius:2px;background:var(--role)}
+.node b{font-weight:500;font-size:19px;line-height:1.22}
+.node small{font-size:14px;line-height:1.38;color:var(--muted)}
+.node.top{justify-content:flex-start}
+.node .num{font-family:Lora,Georgia,serif;font-weight:600;font-size:30px;line-height:1;color:var(--role);margin-bottom:8px}
+.chip{position:absolute;height:40px;border-radius:9px;background:var(--panel2);border:1px solid color-mix(in srgb,var(--role) 40%,var(--line));display:flex;align-items:center;padding:0 14px;font-size:15px;font-weight:500}
+.chip::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--role);margin-right:10px;flex:none}
+.box{position:absolute;border-radius:16px;border:1.5px solid color-mix(in srgb,var(--role) 55%,var(--line));background:color-mix(in srgb,var(--role) 7%,var(--panel))}
+.box > .bt{position:absolute;left:22px;top:16px;font-weight:500;font-size:19px}
+.box > .bs{position:absolute;left:22px;top:44px;font-size:14px;color:var(--muted)}
+.pain{font-size:17px;line-height:1.45;padding-left:22px}
+.pain::before{content:"";position:absolute;left:0;top:7px;width:10px;height:10px;border-radius:2px;background:var(--legacy);transform:rotate(45deg)}
+.pill{position:absolute;height:52px;border-radius:26px;border:1.5px solid color-mix(in srgb,var(--role) 50%,var(--line));background:var(--panel);overflow:hidden;display:flex;align-items:center;padding:0 22px;font-size:17px;font-weight:500}
+.pill .fill{position:absolute;inset:0;background:color-mix(in srgb,var(--role) 26%,transparent)}
+.pill span{position:relative}
+.note{position:absolute;border-radius:12px;background:color-mix(in srgb,var(--target) 10%,var(--panel));border:1px solid color-mix(in srgb,var(--target) 40%,var(--line));padding:14px 20px 14px 24px;font-size:17px;line-height:1.45;display:flex;align-items:center}
+.note::before{content:"";position:absolute;left:10px;top:12px;bottom:12px;width:4px;border-radius:2px;background:var(--target)}
+.rows{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.rows li{font-size:14px;background:var(--panel2);border-radius:6px;padding:5px 10px}
+.mini{position:absolute;display:flex;align-items:flex-end;gap:12px}
+.mini i{display:block;width:28px;border-radius:4px 4px 0 0;background:var(--role)}
+.check{position:absolute;font-size:16px;font-weight:500;color:var(--target);display:flex;align-items:center;gap:8px}
+.check svg{flex:none}
+.crm{position:absolute;border-radius:14px;background:var(--panel);border:1.5px solid color-mix(in srgb,var(--target) 50%,var(--line));overflow:hidden}
+.crm .hd{height:74px;background:color-mix(in srgb,var(--target) 12%,var(--panel));display:flex;align-items:center;gap:14px;padding:0 22px;border-bottom:1px solid var(--line)}
+.crm .av{width:40px;height:40px;border-radius:10px;background:var(--target);opacity:.85}
+.crm .hd small{display:block;font-size:13px;color:var(--muted)}
+.crm .hd b{display:block;font-weight:500;font-size:18px}
+.crm .tabs{display:flex;gap:28px;padding:0 22px;height:44px;align-items:center;font-size:15px;color:var(--muted);border-bottom:1px solid var(--line)}
+.crm .tabs .on{color:var(--text);font-weight:500;box-shadow:inset 0 -3px 0 var(--target);height:100%;display:flex;align-items:center}
+.tile{position:absolute;border-radius:10px;border:1.5px dashed var(--insight);background:color-mix(in srgb,var(--insight) 6%,var(--panel))}
+.tile .tt{position:absolute;left:16px;top:12px;font-size:14px;font-weight:500;color:var(--insight)}
+.kpi{position:absolute;width:130px;height:58px;border-radius:8px;background:var(--panel2);padding:9px 12px}
+.kpi small{display:block;font-size:12px;color:var(--muted)}
+.kpi i{display:block;height:10px;border-radius:5px;margin-top:9px;background:var(--insight);opacity:.8}
+.code{position:absolute;border-radius:14px;background:var(--panel);border:1.5px solid var(--line);overflow:hidden}
+.code .hd{height:40px;display:flex;align-items:center;gap:7px;padding:0 16px;border-bottom:1px solid var(--line);font-size:14px;color:var(--muted)}
+.code .hd i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.code .hd span{margin-left:8px}
+.code .ln{display:block;font-family:ui-monospace,"Liberation Mono","DejaVu Sans Mono",monospace;font-size:15px;line-height:1;padding:9px 18px;white-space:nowrap}
+.code .ln em{font-style:normal;color:var(--transit)}
+.page{position:absolute;width:170px;height:214px;border-radius:10px;background:var(--panel);border:1.5px solid color-mix(in srgb,var(--insight) 55%,var(--line));padding:16px}
+.page b{display:block;font-size:15px;font-weight:500;margin-bottom:12px}
+.page i{display:block;height:8px;border-radius:4px;background:var(--panel2);margin-bottom:9px}
+.page .bar{display:flex;align-items:flex-end;gap:7px;height:56px;margin:14px 0}
+.page .bar u{display:block;width:18px;background:var(--insight);border-radius:3px 3px 0 0;opacity:.85;text-decoration:none}
+.strike{position:absolute;height:3px;border-radius:2px;background:var(--legacy)}
+.panel{position:absolute;border-radius:14px;background:var(--panel);border:1.5px solid var(--line)}
+.panel .pt{position:absolute;left:22px;top:16px;font-size:16px;font-weight:500}
+.hbar{position:absolute;height:22px;border-radius:0 6px 6px 0;background:var(--role)}
+.fig .big{font-family:Lora,Georgia,serif;font-weight:600;font-size:80px;line-height:1;color:var(--role);display:block}
+.fig .fl{display:block;margin-top:14px;font-size:17px;line-height:1.45;color:var(--muted)}
+.c15{animation-name:c15;counter-reset:n var(--n)} .c15::after{content:counter(n)}
+.c10{animation-name:c10;counter-reset:n var(--n)} .c10::after{content:counter(n)}
+.c2{animation-name:c2;counter-reset:n var(--n)} .c2::after{content:counter(n)}
+@keyframes c15{from{--n:0}to{--n:15}} @keyframes c10{from{--n:0}to{--n:10}} @keyframes c2{from{--n:0}to{--n:2}}
+.tagrow{position:absolute;display:flex;flex-wrap:wrap;gap:12px}
+.tagrow span{font-size:17px;font-weight:500;padding:9px 18px;border-radius:22px;border:1.5px solid var(--line);background:var(--panel)}
+
+/* player chrome */
+.big-play{position:absolute;left:84%;top:44%;width:92px;height:92px;margin:-46px 0 0 -46px;border-radius:50%;border:0;background:var(--transit);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 10px 30px color-mix(in srgb,var(--transit) 40%,transparent);transition:transform .15s}
+.big-play:hover{transform:scale(1.05)}
+.big-play[hidden]{display:none}
+.big-play:focus-visible,.controls button:focus-visible,.chapters button:focus-visible,input[type=range]:focus-visible{outline:3px solid var(--insight);outline-offset:3px}
+.controls{display:flex;align-items:center;gap:16px;margin-top:14px}
+.controls button{width:46px;height:46px;flex:none;border-radius:50%;border:1.5px solid var(--line);background:var(--panel);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.controls input{flex:1;accent-color:var(--transit);height:28px;min-width:0}
+.controls .time{font-size:15px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.chapters{list-style:none;margin:22px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.chapters button{width:100%;text-align:left;display:flex;gap:12px;align-items:baseline;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--text);font:inherit;font-size:15px;cursor:pointer}
+.chapters button span{color:var(--muted);font-variant-numeric:tabular-nums;font-size:14px}
+.chapters button[aria-current="true"]{border-color:var(--transit);box-shadow:inset 3px 0 0 var(--transit)}
+.intro-copy{margin:0 0 18px;max-width:72ch}
+.intro-copy h1{font-family:Lora,Georgia,serif;font-weight:600;font-size:clamp(24px,3.4vw,34px);line-height:1.2;margin:0 0 8px}
+.intro-copy p{margin:0;color:var(--muted);font-size:16px;line-height:1.55}
+
+/* render mode for video export */
+html.render body{background:var(--bg)}
+html.render .wrap{padding:0;max-width:none}
+html.render .frame{border:0;border-radius:0;width:1280px;height:720px}
+html.render .controls,html.render .chapters,html.render .big-play,html.render .intro-copy{display:none}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div style="margin-bottom:14px"><a href="index.html#work" style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;">&larr; Back to Portfolio</a></div>
+  <header class="intro-copy">
+    <h1>Data platform migration, explained</h1>
+    <p>A two-minute animated walkthrough of how an enterprise asset manager moved its CRM, data warehouse and reporting to the cloud.</p>
+  </header>
+  <div class="player">
+    <div class="frame" id="frame" tabindex="0" aria-label="Animated walkthrough. Press space to play or pause.">
+      <div id="stage">
+<section class="scene" style="--s:0s;--len:7s" aria-label="Intro">
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-legacy a draw" pathLength="1" d="M90 500 L400 500" style="--d:1.6s;--dur:0.6s"/><path class="wire r-transit a draw" pathLength="1" d="M400 500 L710 500" style="--d:2.1s;--dur:0.6s"/><path class="wire r-target a draw" pathLength="1" d="M710 500 L1020 500" style="--d:2.6s;--dur:0.6s"/><circle cx="90" cy="500" r="10" class="r-legacy a pop" style="fill:var(--role);--d:1.6s"/><circle cx="400" cy="500" r="10" class="r-transit a pop" style="fill:var(--role);--d:2.1s"/><circle cx="710" cy="500" r="10" class="r-target a pop" style="fill:var(--role);--d:2.6s"/><circle cx="1020" cy="500" r="10" class="r-insight a pop" style="fill:var(--role);--d:3.1s"/><circle r="4" class="pk r-neutral" style="offset-path:path('M90 500 L1020 500');--d:3.40s;--dur:3.2s"/><circle r="4" class="pk r-neutral" style="offset-path:path('M90 500 L1020 500');--d:4.47s;--dur:3.2s"/><circle r="4" class="pk r-neutral" style="offset-path:path('M90 500 L1020 500');--d:5.53s;--dur:3.2s"/></svg>
+<div class="t hero a rise" style="left:72px;top:150px;width:1000px;--d:0.2s;">Moving an enterprise asset manager's data to the cloud</div>
+<div class="t lead a rise" style="left:72px;top:326px;width:800px;--d:0.8s;">How the CRM, the data warehouse and the reports were migrated, with Azure moving everything in between.</div>
+<div class="t lbl a fade" style="left:80px;top:528px;width:260px;--d:1.8s;">Legacy systems</div>
+<div class="t lbl a fade" style="left:390px;top:528px;width:260px;--d:2.3s;">Azure in motion</div>
+<div class="t lbl a fade" style="left:700px;top:528px;width:260px;--d:2.8s;">New cloud platforms</div>
+<div class="t lbl a fade" style="left:1010px;top:528px;width:260px;--d:3.3s;">Insight for leaders</div>
+<div class="t small a fade" style="left:72px;top:628px;width:900px;--d:3.2s;font-size:17px">A case study by Nishad Wankhede, Business Intelligence Analyst</div>
+</section>
+<section class="scene" style="--s:7s;--len:10s" aria-label="Where we started">
+<div class="t ttl a rise" style="--d:.15s">Where we started</div><div class="cnt a fade" style="--d:.3s">1 of 9</div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-legacy a draw" pathLength="1" d="M302 250 L374 250" style="--d:1.6s;--dur:0.5s"/><path class="wire r-legacy a draw" pathLength="1" d="M604 250 L676 250" style="--d:2.2s;--dur:0.5s"/><path class="wire dashed r-legacy a fade" d="M906 250 L978 250" style="--d:2.8s;--dur:0.5s"/><circle r="4" class="pk r-legacy" style="offset-path:path('M302 250 L374 250');--d:2.20s;--dur:1.6s"/><circle r="4" class="pk r-legacy" style="offset-path:path('M302 250 L374 250');--d:3.00s;--dur:1.6s"/><circle r="4" class="pk r-legacy" style="offset-path:path('M604 250 L676 250');--d:2.80s;--dur:1.6s"/><circle r="4" class="pk r-legacy" style="offset-path:path('M604 250 L676 250');--d:3.60s;--dur:1.6s"/></svg>
+<div class="node r-legacy a pop " style="left:72px;top:185px;width:230px;height:130px;--d:0.6s"><b>Dynamics 365</b><small>CRM for institutional clients and sales</small></div>
+<div class="node r-legacy a pop " style="left:374px;top:185px;width:230px;height:130px;--d:1.2s"><b>SQL Server</b><small>On-premises data warehouse</small></div>
+<div class="node r-legacy a pop " style="left:676px;top:185px;width:230px;height:130px;--d:1.7999999999999998s"><b>Power BI</b><small>Reports wired to SQL Server</small></div>
+<div class="node r-legacy a pop " style="left:978px;top:185px;width:230px;height:130px;--d:2.4s"><b>Manual decks</b><small>CEO and COO packs built by hand</small></div>
+<div class="t coltag a fade" style="left:72px;top:378px;width:400px;--d:4.0s;">What held the business back</div>
+<div class="t pain a rise" style="left:72px;top:416px;width:340px;--d:4.4s;">Client data split between the CRM and the warehouse</div>
+<div class="t pain a rise" style="left:452px;top:416px;width:340px;--d:5.1000000000000005s;">An on-premises warehouse that was costly to scale</div>
+<div class="t pain a rise" style="left:832px;top:416px;width:340px;--d:5.800000000000001s;">Leadership reporting that depended on manual effort</div>
+<p class="cap a fade" style="margin:0;--d:1.2s;--dur:1s">Client data lived in Dynamics 365, analytics sat in an on-premises SQL Server, and leadership packs were assembled by hand.</p>
+</section>
+<section class="scene" style="--s:17s;--len:12s" aria-label="Target design">
+<div class="t ttl a rise" style="--d:.15s">The design: Azure in the middle</div><div class="cnt a fade" style="--d:.3s">2 of 9</div>
+<div class="t coltag a fade" style="left:72px;top:150px;width:200px;--d:0.5s;">Sources</div>
+<div class="t coltag a fade" style="left:380px;top:150px;width:200px;--d:1.3s;">Movement layer</div>
+<div class="t coltag a fade" style="left:740px;top:150px;width:200px;--d:2.9s;">New platforms</div>
+<div class="t coltag a fade" style="left:1012px;top:150px;width:200px;--d:4.3s;">Insight</div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-legacy a draw" pathLength="1" d="M292 238 L380 238" style="--d:2.0s;--dur:0.5s"/><path class="wire r-legacy a draw" pathLength="1" d="M292 448 L380 448" style="--d:2.2s;--dur:0.5s"/><path class="wire r-transit a draw" pathLength="1" d="M650 238 L740 238" style="--d:3.4s;--dur:0.5s"/><path class="wire r-transit a draw" pathLength="1" d="M650 448 L740 448" style="--d:3.6s;--dur:0.5s"/><path class="wire r-target a draw" pathLength="1" d="M960 440 C990 440 985 352 1012 352" style="--d:4.6s;--dur:0.6s"/><path class="wire r-target a draw" pathLength="1" d="M960 470 C990 470 985 488 1012 488" style="--d:5.0s;--dur:0.6s"/><path class="wire dashed r-insight a fade" d="M1110 304 C1110 238 1010 238 960 238" style="--d:6.0s;--dur:0.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M292 238 L740 238');--d:4.20s;--dur:2.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M292 238 L740 238');--d:5.07s;--dur:2.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M292 238 L740 238');--d:5.93s;--dur:2.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M292 448 L740 448');--d:4.40s;--dur:2.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M292 448 L740 448');--d:5.27s;--dur:2.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M292 448 L740 448');--d:6.13s;--dur:2.6s"/><circle r="4" class="pk r-target" style="offset-path:path('M960 440 C990 440 985 352 1012 352');--d:5.40s;--dur:1.8s"/><circle r="4" class="pk r-target" style="offset-path:path('M960 440 C990 440 985 352 1012 352');--d:6.30s;--dur:1.8s"/></svg>
+<div class="node r-legacy a pop " style="left:72px;top:190px;width:220px;height:96px;--d:0.6s"><b>Dynamics 365</b><small>Client and sales CRM</small></div>
+<div class="node r-legacy a pop " style="left:72px;top:400px;width:220px;height:96px;--d:0.8s"><b>SQL Server</b><small>On-premises warehouse</small></div>
+<div class="box r-transit a pop" style="left:380px;top:180px;width:270px;height:330px;--d:1.4s"><div class="bt">Azure</div><div class="bs">Moves, stages and secures</div></div>
+<div class="chip r-transit a pop" style="left:400px;top:262px;width:230px;--d:1.9s">Data Factory pipelines</div>
+<div class="chip r-transit a pop" style="left:400px;top:314px;width:230px;--d:2.1s">Data Lake staging</div>
+<div class="chip r-transit a pop" style="left:400px;top:366px;width:230px;--d:2.3s">Key Vault secrets</div>
+<div class="chip r-transit a pop" style="left:400px;top:418px;width:230px;--d:2.5s">Entra ID sign-in</div>
+<div class="node r-target a pop " style="left:740px;top:190px;width:220px;height:96px;--d:3.0s"><b>Salesforce</b><small>New client and sales CRM</small></div>
+<div class="node r-target a pop " style="left:740px;top:400px;width:220px;height:96px;--d:3.2s"><b>Snowflake</b><small>New cloud warehouse</small></div>
+<div class="node r-insight a pop " style="left:1012px;top:304px;width:196px;height:96px;--d:4.6s"><b>Power BI</b><small>Reports on Snowflake</small></div>
+<div class="node r-insight a pop " style="left:1012px;top:446px;width:196px;height:84px;--d:5.0s"><b>Python reports</b><small>CEO and COO pack</small></div>
+<div class="t small a fade" style="left:1000px;top:204px;width:120px;--d:6.4s;color:var(--insight);font-size:14px">embedded</div>
+<p class="cap a fade" style="margin:0;--d:1.2s;--dur:1s">Azure Data Factory moved the data and Azure Data Lake staged it; Snowflake then fed one reporting layer that also lives inside Salesforce.</p>
+</section>
+<section class="scene" style="--s:29s;--len:14s" aria-label="CRM migration">
+<div class="t ttl a rise" style="--d:.15s">Workstream 1: Dynamics 365 to Salesforce</div><div class="cnt a fade" style="--d:.3s">3 of 9</div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-transit a draw" pathLength="1" d="M280 245 L304 245" style="--d:1.4s;--dur:0.3s"/><path class="wire r-transit a draw" pathLength="1" d="M512 245 L536 245" style="--d:2.0999999999999996s;--dur:0.3s"/><path class="wire r-target a draw" pathLength="1" d="M744 245 L768 245" style="--d:2.8s;--dur:0.3s"/><path class="wire r-target a draw" pathLength="1" d="M976 245 L1000 245" style="--d:3.4999999999999996s;--dur:0.3s"/><path class="wire r-target a draw" pathLength="1" d="M302 451 L374 451" style="--d:6.0s;--dur:0.4s"/><path class="wire r-target a draw" pathLength="1" d="M604 451 L676 451" style="--d:7.2s;--dur:0.4s"/><path class="wire r-target a draw" pathLength="1" d="M906 451 L978 451" style="--d:8.4s;--dur:0.4s"/></svg>
+<div class="node r-transit a pop top" style="left:72px;top:165px;width:208px;height:160px;--d:1.0s"><span class="num">1</span><b>Extract</b><small>Data Factory reads Dataverse tables on a schedule</small></div>
+<div class="node r-transit a pop top" style="left:304px;top:165px;width:208px;height:160px;--d:1.7s"><span class="num">2</span><b>Land</b><small>Raw copies kept in Data Lake for audit and replay</small></div>
+<div class="node r-transit a pop top" style="left:536px;top:165px;width:208px;height:160px;--d:2.4s"><span class="num">3</span><b>Map and cleanse</b><small>Fields, picklists and owners mapped; duplicates merged</small></div>
+<div class="node r-target a pop top" style="left:768px;top:165px;width:208px;height:160px;--d:3.0999999999999996s"><span class="num">4</span><b>Load</b><small>Bulk API upserts into Salesforce, parents first</small></div>
+<div class="node r-target a pop top" style="left:1000px;top:165px;width:208px;height:160px;--d:3.8s"><span class="num">5</span><b>Reconcile</b><small>Record counts and spot checks signed off</small></div>
+<div class="t coltag a fade" style="left:72px;top:388px;width:400px;--d:4.7s;">Load order</div>
+<div class="pill r-target a pop" style="left:72px;top:425px;width:230px;--d:5.0s"><i class="fill a growx" style="--d:5.3s;--dur:1s"></i><span>Accounts</span></div>
+<div class="pill r-target a pop" style="left:374px;top:425px;width:230px;--d:6.2s"><i class="fill a growx" style="--d:6.5s;--dur:1s"></i><span>Contacts</span></div>
+<div class="pill r-target a pop" style="left:676px;top:425px;width:230px;--d:7.4s"><i class="fill a growx" style="--d:7.7s;--dur:1s"></i><span>Opportunities</span></div>
+<div class="pill r-target a pop" style="left:978px;top:425px;width:230px;--d:8.6s"><i class="fill a growx" style="--d:8.9s;--dur:1s"></i><span>Activities and notes</span></div>
+<div class="note a rise" style="left:72px;top:506px;width:1136px;height:64px;--d:10s">The Dynamics record ID was kept as an external ID in Salesforce, so any batch could be rerun without creating duplicates.</div>
+<p class="cap a fade" style="margin:0;--d:1.4s;--dur:1s">Every object moved in dependency order, with an audit copy in the lake before anything reached Salesforce.</p>
+</section>
+<section class="scene" style="--s:43s;--len:14s" aria-label="Warehouse migration">
+<div class="t ttl a rise" style="--d:.15s">Workstream 2: SQL Server to Snowflake</div><div class="cnt a fade" style="--d:.3s">4 of 9</div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-legacy a draw" pathLength="1" d="M302 280 L400 280" style="--d:1.6s;--dur:0.5s"/><path class="wire r-transit a draw" pathLength="1" d="M620 280 L720 280" style="--d:2.6s;--dur:0.5s"/><circle r="5" class="pk r-legacy" style="offset-path:path('M302 280 L400 280');--d:2.00s;--dur:1.6s"/><circle r="5" class="pk r-legacy" style="offset-path:path('M302 280 L400 280');--d:2.53s;--dur:1.6s"/><circle r="5" class="pk r-legacy" style="offset-path:path('M302 280 L400 280');--d:3.07s;--dur:1.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M620 280 L720 280');--d:3.00s;--dur:1.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M620 280 L720 280');--d:3.53s;--dur:1.6s"/><circle r="5" class="pk r-transit" style="offset-path:path('M620 280 L720 280');--d:4.07s;--dur:1.6s"/></svg>
+<div class="node r-legacy a pop top" style="left:72px;top:160px;width:230px;height:250px;--d:.6s"><b>SQL Server</b><small>Source warehouse</small><ul class="rows"><li>Clients</li><li>Holdings</li><li>Fund flows</li><li>Products</li></ul></div>
+<div class="node r-transit a pop " style="left:400px;top:220px;width:220px;height:120px;--d:1.9s"><b>Data Lake</b><small>History landed as Parquet files</small></div>
+<div class="box r-target a pop" style="left:720px;top:160px;width:488px;height:262px;--d:3.0s"><div class="bt">Snowflake</div><div class="bs">Rebuilt as a star schema</div></div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-target a draw" pathLength="1" d="M964 324 L808 264" style="--d:4.4s;--dur:0.4s"/><path class="wire r-target a draw" pathLength="1" d="M964 324 L1120 264" style="--d:4.6s;--dur:0.4s"/><path class="wire r-target a draw" pathLength="1" d="M964 324 L808 384" style="--d:4.8s;--dur:0.4s"/><path class="wire r-target a draw" pathLength="1" d="M964 324 L1120 384" style="--d:5.0s;--dur:0.4s"/></svg>
+<div class="chip r-target a pop" style="left:864px;top:304px;width:200px;justify-content:center;--d:3.8s">Fact: AUM and flows</div>
+<div class="chip r-target a pop" style="left:744px;top:244px;width:136px;--d:4.6s">Client</div>
+<div class="chip r-target a pop" style="left:1052px;top:244px;width:136px;--d:4.8s">Fund</div>
+<div class="chip r-target a pop" style="left:744px;top:364px;width:136px;--d:5.0s">Date</div>
+<div class="chip r-target a pop" style="left:1052px;top:364px;width:136px;--d:5.2s">Sales team</div>
+<div class="t a rise r-legacy" style="left:72px;top:458px;width:208px;--d:6.0s"><span style="font-family:Lora,Georgia,serif;font-weight:600;font-size:26px;color:var(--role)">1</span><div style="font-size:16px;line-height:1.4;margin-top:4px">Convert T-SQL to Snowflake SQL</div></div>
+<div class="t a rise r-transit" style="left:304px;top:458px;width:208px;--d:6.7s"><span style="font-family:Lora,Georgia,serif;font-weight:600;font-size:26px;color:var(--role)">2</span><div style="font-size:16px;line-height:1.4;margin-top:4px">Bulk copy history to Parquet</div></div>
+<div class="t a rise r-target" style="left:536px;top:458px;width:208px;--d:7.4s"><span style="font-family:Lora,Georgia,serif;font-weight:600;font-size:26px;color:var(--role)">3</span><div style="font-size:16px;line-height:1.4;margin-top:4px">COPY INTO from an external stage</div></div>
+<div class="t a rise r-target" style="left:768px;top:458px;width:208px;--d:8.1s"><span style="font-family:Lora,Georgia,serif;font-weight:600;font-size:26px;color:var(--role)">4</span><div style="font-size:16px;line-height:1.4;margin-top:4px">Incremental loads by watermark</div></div>
+<div class="t a rise r-target" style="left:1000px;top:458px;width:208px;--d:8.8s"><span style="font-family:Lora,Georgia,serif;font-weight:600;font-size:26px;color:var(--role)">5</span><div style="font-size:16px;line-height:1.4;margin-top:4px">Validate counts and totals</div></div>
+<div class="check a pop" style="left:72px;top:556px;--d:10.4s"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.5l2.6 2.6L14 7.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Row counts match source</div>
+<div class="check a pop" style="left:340px;top:556px;--d:10.9s"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.5l2.6 2.6L14 7.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Totals match source</div>
+<p class="cap a fade" style="margin:0;--d:1.2s;--dur:1s">History moved once in bulk; watermark-based incremental loads then kept Snowflake in step until cutover.</p>
+</section>
+<section class="scene" style="--s:57s;--len:14s" aria-label="Report migration">
+<div class="t ttl a rise" style="--d:.15s">Workstream 3: moving the reports</div><div class="cnt a fade" style="--d:.3s">5 of 9</div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-legacy a draw" pathLength="1" d="M322 236 L420 205" style="--d:.9s;--dur:.5s"/><path class="wire r-legacy a dim" d="M322 236 L420 205" style="--d:2.8s;--dur:.6s;stroke-dasharray:5 7"/><path class="wire r-target a draw" pathLength="1" d="M322 276 L420 322" style="--d:3.2s;--dur:0.6s"/><circle r="4" class="pk r-target" style="offset-path:path('M420 322 L322 276');--d:3.80s;--dur:1.4s"/><circle r="4" class="pk r-target" style="offset-path:path('M420 322 L322 276');--d:4.50s;--dur:1.4s"/></svg>
+<div class="node r-insight a pop " style="left:72px;top:180px;width:250px;height:150px;--d:0.5s"><b>Power BI reports</b><small>Datasets, DAX measures and scheduled refresh</small></div>
+<div class="node r-legacy a dim" style="left:420px;top:172px;width:180px;height:66px;--d:2.8s;--dur:.6s;padding-top:8px;padding-bottom:8px"><b style="font-size:17px">SQL Server</b><small>Old source</small></div>
+<div class="node r-target a pop " style="left:420px;top:290px;width:180px;height:66px;--d:3.0s"><b><span style='font-size:17px'>Snowflake</span></b><small>New source</small></div>
+<div class="t coltag a fade" style="left:72px;top:352px;width:400px;--d:4.4s;">Parallel run before switching users over</div>
+<div class="panel a pop" style="left:72px;top:386px;width:250px;height:150px;--d:4.6s"><div class="pt" style="font-size:14px;color:var(--muted);font-weight:400">Previous source</div></div><div class="mini r-legacy" style="left:106px;top:424px;height:100px"><i class="a growy" style="height:52px;--d:5.0s;--dur:.6s"></i><i class="a growy" style="height:78px;--d:5.12s;--dur:.6s"></i><i class="a growy" style="height:64px;--d:5.24s;--dur:.6s"></i><i class="a growy" style="height:96px;--d:5.36s;--dur:.6s"></i><i class="a growy" style="height:86px;--d:5.48s;--dur:.6s"></i></div>
+<div class="panel a pop" style="left:350px;top:386px;width:250px;height:150px;--d:5.1s"><div class="pt" style="font-size:14px;color:var(--muted);font-weight:400">Snowflake</div></div><div class="mini r-target" style="left:384px;top:424px;height:100px"><i class="a growy" style="height:52px;--d:5.5s;--dur:.6s"></i><i class="a growy" style="height:78px;--d:5.62s;--dur:.6s"></i><i class="a growy" style="height:64px;--d:5.74s;--dur:.6s"></i><i class="a growy" style="height:96px;--d:5.86s;--dur:.6s"></i><i class="a growy" style="height:86px;--d:5.98s;--dur:.6s"></i></div>
+<div class="check a pop" style="left:72px;top:552px;--d:6.8s"><svg width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 10.5l2.6 2.6L14 7.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Numbers match, report signed off</div>
+<div class="crm a pop" style="left:660px;top:160px;width:548px;height:416px;--d:7.4s"><div class="hd"><div class="av"></div><div><small>Salesforce account</small><b>Sample institutional client</b></div></div><div class="tabs"><span>Details</span><span>Activity</span><span class="on">AUM insights</span></div></div>
+<div class="tile a pop" style="left:684px;top:296px;width:500px;height:262px;--d:8.2s"><div class="tt">Embedded Power BI report</div></div>
+<div class="kpi a pop" style="left:700px;top:334px;--d:8.6s"><small>AUM</small><i style="width:80%"></i></div>
+<div class="kpi a pop" style="left:852px;top:334px;--d:8.799999999999999s"><small>Net flows</small><i style="width:55%"></i></div>
+<div class="kpi a pop" style="left:1004px;top:334px;--d:9.0s"><small>Revenue</small><i style="width:68%"></i></div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="a draw" pathLength="1" d="M708 536 C760 528 790 520 830 506 S900 486 940 478 S1010 458 1050 448 S1120 428 1168 416" style="fill:none;stroke:var(--insight);stroke-width:3;stroke-linecap:round;--d:9.0s;--dur:1.8s"/></svg>
+<p class="cap a fade" style="margin:0;--d:1.2s;--dur:1s">Reports were repointed to Snowflake and run in parallel until the numbers matched, then embedded where sales teams already worked.</p>
+</section>
+<section class="scene" style="--s:71s;--len:11s" aria-label="Azure’s role">
+<div class="t ttl a rise" style="--d:.15s">What Azure did at every step</div><div class="cnt a fade" style="--d:.3s">6 of 9</div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-transit a draw" pathLength="1" d="M640 300 L392 216" style="--d:1.2s;--dur:0.5s"/><path class="wire r-transit a draw" pathLength="1" d="M640 300 L888 216" style="--d:1.8s;--dur:0.5s"/><path class="wire r-transit a draw" pathLength="1" d="M640 300 L392 420" style="--d:2.4s;--dur:0.5s"/><path class="wire r-transit a draw" pathLength="1" d="M640 300 L888 420" style="--d:3.0s;--dur:0.5s"/><path class="wire r-transit a draw" pathLength="1" d="M640 300 L640 452" style="--d:3.6s;--dur:0.5s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L392 216');--d:1.80s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L392 216');--d:2.70s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L888 216');--d:2.40s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L888 216');--d:3.30s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L392 420');--d:3.00s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L392 420');--d:3.90s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L888 420');--d:3.60s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L888 420');--d:4.50s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L640 452');--d:4.20s;--dur:1.8s"/><circle r="4" class="pk r-transit" style="offset-path:path('M640 300 L640 452');--d:5.10s;--dur:1.8s"/><circle cx="640" cy="300" r="78" class="r-transit a pop" style="fill:var(--panel);stroke:var(--transit);stroke-width:2;--d:.5s"/><g class="a fade" style="--d:1s"><circle cx="640" cy="300" r="96" class="spin" style="fill:none;stroke:var(--transit);stroke-width:1.5;stroke-dasharray:4 10;opacity:.7"/></g></svg>
+<div class="t  a fade" style="left:560px;top:282px;width:160px;--d:0.8s;text-align:center;font-family:Lora,Georgia,serif;font-weight:600;font-size:30px;line-height:1.2;color:var(--transit)">Azure</div>
+<div class="node r-transit a pop " style="left:72px;top:168px;width:320px;height:96px;--d:1.5s"><b>Orchestration</b><small>Data Factory pipelines, triggers and retries</small></div>
+<div class="node r-transit a pop " style="left:888px;top:168px;width:320px;height:96px;--d:2.1s"><b>Staging</b><small>Data Lake landing and audit zone</small></div>
+<div class="node r-transit a pop " style="left:72px;top:372px;width:320px;height:96px;--d:2.7s"><b>Secrets</b><small>Key Vault holds Salesforce and Snowflake credentials</small></div>
+<div class="node r-transit a pop " style="left:888px;top:372px;width:320px;height:96px;--d:3.3s"><b>Identity</b><small>Entra ID signs users in to embedded Power BI</small></div>
+<div class="node r-transit a pop " style="left:480px;top:452px;width:320px;height:96px;--d:3.9s"><b>Monitoring</b><small>Alerts on failed or late pipeline runs</small></div>
+<p class="cap a fade" style="margin:0;--d:1.2s;--dur:1s">Azure was the conveyor belt: it scheduled, staged, secured and monitored every movement of data.</p>
+</section>
+<section class="scene" style="--s:82s;--len:10s" aria-label="C-suite automation">
+<div class="t ttl a rise" style="--d:.15s">Automating the CEO and COO pack</div><div class="cnt a fade" style="--d:.3s">7 of 9</div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-target a draw" pathLength="1" d="M292 300 L360 300" style="--d:1.0s;--dur:0.5s"/><path class="wire r-insight a draw" pathLength="1" d="M720 300 L800 300" style="--d:4.4s;--dur:0.5s"/><circle r="4" class="pk r-target" style="offset-path:path('M292 300 L360 300');--d:1.40s;--dur:1.5s"/><circle r="4" class="pk r-target" style="offset-path:path('M292 300 L360 300');--d:2.15s;--dur:1.5s"/><circle r="4" class="pk r-insight" style="offset-path:path('M720 300 L800 300');--d:4.80s;--dur:1.5s"/><circle r="4" class="pk r-insight" style="offset-path:path('M720 300 L800 300');--d:5.55s;--dur:1.5s"/></svg>
+<div class="node r-target a pop " style="left:72px;top:252px;width:220px;height:96px;--d:0.5s"><b>Snowflake</b><small>Governed KPIs</small></div>
+<div class="code a pop" style="left:360px;top:206px;width:360px;height:190px;--d:1.0s"><div class="hd"><i></i><i></i><i></i><span>report_pack.py</span></div><div style="padding-top:10px"><code class="ln a type" style="--d:1.6s;--dur:.7s">kpis = snowflake.query(<em>exec_kpis</em>)</code><code class="ln a type" style="--d:2.4000000000000004s;--dur:.7s">charts = build_charts(kpis)</code><code class="ln a type" style="--d:3.2s;--dur:.7s">pack = render_pack(charts)</code><code class="ln a type" style="--d:4.0s;--dur:.7s">send(pack, to=[<em>"CEO"</em>, <em>"COO"</em>])</code></div></div>
+<div style="position:absolute;left:800px;top:198px;transform:rotate(-5deg)"><div class="page a pop" style="position:relative;--d:4.8s"><b>CEO pack</b><i style="width:80%"></i><i style="width:60%"></i><div class="bar"><u style="height:30%"></u><u style="height:55%"></u><u style="height:45%"></u><u style="height:80%"></u><u style="height:70%"></u></div><i style="width:70%"></i></div></div>
+<div style="position:absolute;left:890px;top:192px;transform:rotate(0deg)"><div class="page a pop" style="position:relative;--d:5.2s"><b>COO pack</b><i style="width:80%"></i><i style="width:60%"></i><div class="bar"><u style="height:30%"></u><u style="height:55%"></u><u style="height:45%"></u><u style="height:80%"></u><u style="height:70%"></u></div><i style="width:70%"></i></div></div>
+<div style="position:absolute;left:980px;top:198px;transform:rotate(5deg)"><div class="page a pop" style="position:relative;--d:5.6s"><b>Board review</b><i style="width:80%"></i><i style="width:60%"></i><div class="bar"><u style="height:30%"></u><u style="height:55%"></u><u style="height:45%"></u><u style="height:80%"></u><u style="height:70%"></u></div><i style="width:70%"></i></div></div>
+<div class="t coltag a fade" style="left:72px;top:424px;width:400px;--d:0.7s;">Before</div>
+<div class="node r-legacy a pop " style="left:72px;top:456px;width:330px;height:84px;--d:0.9s"><b>Manual decks</b><small>Rebuilt by hand every review cycle</small></div>
+<div class="strike a growx" style="left:60px;top:496px;width:354px;--d:6.4s;--dur:.5s"></div>
+<div class="t lbl a fade" style="left:428px;top:486px;width:200px;--d:6.9s;color:var(--legacy)">Retired</div>
+<p class="cap a fade" style="margin:0;--d:1.2s;--dur:1s">A scheduled Python job builds the leadership pack straight from Snowflake, replacing hand-made decks for C-suite and board reviews.</p>
+</section>
+<section class="scene" style="--s:92s;--len:10s" aria-label="Fabric proof of concept">
+<div class="t ttl a rise" style="--d:.15s">Fabric proof of concept: liquidity and AUM</div><div class="cnt a fade" style="--d:.3s">8 of 9</div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-target a draw" pathLength="1" d="M324 214 L360 214" style="--d:1.2s;--dur:0.3s"/><path class="wire r-target a draw" pathLength="1" d="M612 214 L648 214" style="--d:1.7999999999999998s;--dur:0.3s"/><path class="wire r-insight a draw" pathLength="1" d="M900 214 L936 214" style="--d:2.4s;--dur:0.3s"/><circle r="4" class="pk r-target" style="offset-path:path('M324 214 L936 214');--d:2.80s;--dur:2.4s"/><circle r="4" class="pk r-target" style="offset-path:path('M324 214 L936 214');--d:3.60s;--dur:2.4s"/><circle r="4" class="pk r-target" style="offset-path:path('M324 214 L936 214');--d:4.40s;--dur:2.4s"/></svg>
+<div class="node r-target a pop " style="left:72px;top:168px;width:252px;height:92px;--d:0.6s"><b>Snowflake and feeds</b><small>Holdings, flows and cash</small></div>
+<div class="node r-target a pop " style="left:360px;top:168px;width:252px;height:92px;--d:1.2s"><b>OneLake lakehouse</b><small>One copy of the data</small></div>
+<div class="node r-target a pop " style="left:648px;top:168px;width:252px;height:92px;--d:1.7999999999999998s"><b>Direct Lake model</b><small>No import refresh to wait on</small></div>
+<div class="node r-insight a pop " style="left:936px;top:168px;width:252px;height:92px;--d:2.4s"><b>Power BI report</b><small>Liquidity and AUM</small></div>
+<div class="panel a pop" style="left:72px;top:296px;width:560px;height:250px;--d:3.8s"><div class="pt">AUM trend</div></div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="a fade" d="M96 520 L96 470 C150 462 190 455 240 440 S330 420 380 404 S470 382 520 366 S580 350 608 344 L608 520 Z" style="fill:var(--insight);fill-opacity:.16;--d:5.6s;--dur:1s"/><path class="a draw" pathLength="1" d="M96 470 C150 462 190 455 240 440 S330 420 380 404 S470 382 520 366 S580 350 608 344" style="fill:none;stroke:var(--insight);stroke-width:3;stroke-linecap:round;--d:4.6s;--dur:1.6s"/></svg>
+<div class="panel a pop" style="left:664px;top:296px;width:544px;height:250px;--d:4.2s"><div class="pt">Liquidity profile</div></div>
+<div class="t small a fade" style="left:688px;top:350px;width:150px;--d:4.6s;font-size:14px;line-height:22px">Same day</div>
+<div class="t small a fade" style="left:688px;top:396px;width:150px;--d:4.85s;font-size:14px;line-height:22px">Within 7 days</div>
+<div class="t small a fade" style="left:688px;top:442px;width:150px;--d:5.1s;font-size:14px;line-height:22px">Within 30 days</div>
+<div class="t small a fade" style="left:688px;top:488px;width:150px;--d:5.35s;font-size:14px;line-height:22px">Longer</div>
+<div class="hbar r-insight a growx" style="left:820px;top:350px;width:360px;--d:4.8s;--dur:.8s;border-radius:4px"></div>
+<div class="hbar r-insight a growx" style="left:820px;top:396px;width:270px;--d:5.05s;--dur:.8s;border-radius:4px"></div>
+<div class="hbar r-insight a growx" style="left:820px;top:442px;width:180px;--d:5.3s;--dur:.8s;border-radius:4px"></div>
+<div class="hbar r-insight a growx" style="left:820px;top:488px;width:90px;--d:5.55s;--dur:.8s;border-radius:4px"></div>
+<p class="cap a fade" style="margin:0;--d:1.2s;--dur:1s">The proof of concept tested OneLake and Direct Lake mode for faster liquidity and AUM analysis on one copy of the data.</p>
+</section>
+<section class="scene" style="--s:102s;--len:10s" aria-label="Impact">
+<div class="t ttl a rise" style="--d:.15s">What changed</div><div class="cnt a fade" style="--d:.3s">9 of 9</div>
+<div class="t fig r-insight a rise" style="left:72px;top:180px;width:260px;--d:0.6s"><span class="big">+<span class="a c15" style="--d:1s;--dur:1.6s"></span>%</span><span class="fl">Sales effectiveness, from SQL market intelligence models</span></div>
+<div class="t fig r-target a rise" style="left:362px;top:180px;width:260px;--d:1.2s"><span class="big">+<span class="a c10" style="--d:1.6s;--dur:1.6s"></span>%</span><span class="fl">Institutional client retention, with tracking built alongside regional sales directors</span></div>
+<div class="t fig r-transit a rise" style="left:652px;top:180px;width:260px;--d:1.8s"><span class="big">0</span><span class="fl">Manual decks left for C-suite and board reviews</span></div>
+<div class="t fig r-target a rise" style="left:942px;top:180px;width:260px;--d:2.4s"><span class="big"><span class="a c2" style="--d:2.8s;--dur:.8s"></span></span><span class="fl">Core platforms migrated: the CRM and the data warehouse</span></div>
+<svg class="wires" viewBox="0 0 1280 720" aria-hidden="true"><path class="wire r-legacy a draw" pathLength="1" d="M90 492 L390 492" style="--d:4.2s;--dur:0.5s"/><path class="wire r-transit a draw" pathLength="1" d="M390 492 L690 492" style="--d:4.6s;--dur:0.5s"/><path class="wire r-target a draw" pathLength="1" d="M690 492 L990 492" style="--d:5.0s;--dur:0.5s"/><circle cx="90" cy="492" r="9" class="r-legacy a pop" style="fill:var(--role);--d:4.2s"/><circle cx="390" cy="492" r="9" class="r-transit a pop" style="fill:var(--role);--d:4.6000000000000005s"/><circle cx="690" cy="492" r="9" class="r-target a pop" style="fill:var(--role);--d:5.0s"/><circle cx="990" cy="492" r="9" class="r-insight a pop" style="fill:var(--role);--d:5.4s"/><circle r="4" class="pk r-neutral" style="offset-path:path('M90 492 L990 492');--d:5.60s;--dur:3.0s"/><circle r="4" class="pk r-neutral" style="offset-path:path('M90 492 L990 492');--d:6.60s;--dur:3.0s"/><circle r="4" class="pk r-neutral" style="offset-path:path('M90 492 L990 492');--d:7.60s;--dur:3.0s"/></svg>
+<div class="t lbl a fade" style="left:80px;top:518px;width:280px;--d:4.4s;font-size:15px">Dynamics 365 and SQL Server</div>
+<div class="t lbl a fade" style="left:380px;top:518px;width:280px;--d:4.800000000000001s;font-size:15px">Azure</div>
+<div class="t lbl a fade" style="left:680px;top:518px;width:280px;--d:5.2s;font-size:15px">Salesforce and Snowflake</div>
+<div class="t lbl a fade" style="left:980px;top:518px;width:280px;--d:5.6000000000000005s;font-size:15px">Power BI and Python reports</div>
+<p class="cap a fade" style="margin:0;--d:1.4s;--dur:1s">One governed data platform, one reporting layer, and leadership reporting that runs on its own.</p>
+</section>
+<section class="scene last" style="--s:112s;--len:8s" aria-label="Contact">
+<div class="t hero a rise" style="left:72px;top:170px;width:1000px;--d:0.2s;font-size:76px">Nishad Wankhede</div>
+<div class="t lead a rise" style="left:72px;top:268px;width:900px;--d:0.7s;">Business Intelligence Analyst in Dubai, focused on data migrations, cloud warehousing and executive reporting.</div>
+<div class="tagrow" style="left:72px;top:390px;width:1100px"><span class="a pop" style="--d:1.4s">Power BI</span><span class="a pop" style="--d:1.5499999999999998s">SQL</span><span class="a pop" style="--d:1.7s">Snowflake</span><span class="a pop" style="--d:1.8499999999999999s">Azure Data Factory</span><span class="a pop" style="--d:2.0s">Microsoft Fabric</span><span class="a pop" style="--d:2.15s">Python</span><span class="a pop" style="--d:2.3s">Salesforce</span></div>
+<div class="t lbl a fade" style="left:72px;top:500px;width:1000px;--d:2.8s;font-size:19px">nishadwankhede1@gmail.com <span style='color:var(--muted);padding:0 14px'>|</span> linkedin.com/in/nishadwankhede</div>
+<div class="t lbl a fade" style="left:72px;top:548px;width:600px;--d:3.4s;font-size:19px;color:var(--target)">Available immediately</div>
+</section>
+      </div>
+      <button class="big-play" id="bigPlay" type="button" aria-label="Play video"></button>
+    </div>
+    <div class="controls">
+      <button id="playBtn" type="button" aria-label="Play"></button>
+      <input id="scrub" type="range" min="0" max="120" step="0.01" value="0" aria-label="Seek">
+      <span class="time" id="time">0:00</span>
+    </div>
+    <ol class="chapters" id="chapters" aria-label="Chapters"></ol>
+  </div>
+</main>
+<script>
+(function(){
+const TOTAL = 120;
+const CH = [[0.0, "Intro"], [7.0, "Where we started"], [17.0, "Target design"], [29.0, "CRM migration"], [43.0, "Warehouse migration"], [57.0, "Report migration"], [71.0, "Azure’s role"], [82.0, "C-suite automation"], [92.0, "Fabric proof of concept"], [102.0, "Impact"], [112.0, "Contact"]];
+const frame = document.getElementById('frame');
+const stage = document.getElementById('stage');
+const scrub = document.getElementById('scrub');
+const timeEl = document.getElementById('time');
+const playBtn = document.getElementById('playBtn');
+const bigPlay = document.getElementById('bigPlay');
+const list = document.getElementById('chapters');
+const POSTER = 4.4;
+let anims = [], t = 0, playing = false, last = null, started = false;
+
+const ICON_PLAY = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M5 3.2v11.6L14.5 9z" fill="currentColor"/></svg>';
+const ICON_PAUSE = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><rect x="4" y="3" width="3.6" height="12" rx="1" fill="currentColor"/><rect x="10.4" y="3" width="3.6" height="12" rx="1" fill="currentColor"/></svg>';
+const ICON_REPLAY = '<svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 4a6 6 0 1 1-5.6 3.9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M3.5 3.5v4.4h4.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+function fmt(s){ s = Math.max(0, Math.floor(s)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); }
+function fit(){ stage.style.setProperty('--k', frame.clientWidth / 1280); }
+function collect(){ anims = stage.getAnimations({subtree:true}); anims.forEach(a => a.pause()); }
+function apply(){ const ms = t * 1000; for (const a of anims){ a.currentTime = ms; } }
+function chapterIndex(){ let k = 0; CH.forEach((c,i) => { if (t >= c[0] - 0.001) k = i; }); return k; }
+function ui(){
+  scrub.value = started ? t : 0;
+  timeEl.textContent = fmt(started ? t : 0) + ' / ' + fmt(TOTAL);
+  const atEnd = t >= TOTAL - 0.01;
+  playBtn.innerHTML = playing ? ICON_PAUSE : (atEnd ? ICON_REPLAY : ICON_PLAY);
+  playBtn.setAttribute('aria-label', playing ? 'Pause' : (atEnd ? 'Replay' : 'Play'));
+  bigPlay.hidden = playing;
+  bigPlay.innerHTML = atEnd ? ICON_REPLAY.replace('width="20" height="20"','width="38" height="38"') : ICON_PLAY.replace('width="18" height="18"','width="36" height="36"');
+  bigPlay.setAttribute('aria-label', atEnd ? 'Replay video' : 'Play video');
+  const k = started ? chapterIndex() : -1;
+  list.querySelectorAll('button').forEach((b,i) => b.setAttribute('aria-current', i === k ? 'true' : 'false'));
+}
+function seek(s){ t = Math.min(TOTAL, Math.max(0, s)); apply(); ui(); }
+function tick(now){
+  if (!playing) return;
+  if (last !== null) t += (now - last) / 1000;
+  last = now;
+  if (t >= TOTAL){ t = TOTAL; playing = false; }
+  apply(); ui();
+  if (playing) requestAnimationFrame(tick);
+}
+function play(){
+  if (!started){ started = true; t = 0; }
+  if (t >= TOTAL - 0.01) t = 0;
+  playing = true; last = null; requestAnimationFrame(tick); ui();
+}
+function pause(){ playing = false; ui(); }
+function toggle(){ playing ? pause() : play(); }
+
+CH.forEach((c, i) => {
+  const li = document.createElement('li');
+  const b = document.createElement('button');
+  b.type = 'button';
+  b.innerHTML = '<span>' + fmt(c[0]) + '</span>' + c[1];
+  b.addEventListener('click', () => { started = true; seek(c[0] + 0.01); if (!playing) play(); });
+  li.appendChild(b); list.appendChild(li);
+});
+scrub.max = TOTAL;
+scrub.addEventListener('input', () => { started = true; seek(parseFloat(scrub.value)); });
+playBtn.addEventListener('click', toggle);
+bigPlay.addEventListener('click', e => { e.stopPropagation(); play(); });
+frame.addEventListener('click', toggle);
+document.addEventListener('keydown', e => {
+  if (e.target.closest('input,button')) return;
+  if (e.key === ' ' || e.key === 'k'){ e.preventDefault(); toggle(); }
+  else if (e.key === 'ArrowRight'){ started = true; seek(t + 5); }
+  else if (e.key === 'ArrowLeft'){ started = true; seek(t - 5); }
+});
+new ResizeObserver(fit).observe(frame);
+fit();
+
+function init(){ collect(); seek(POSTER); }
+(document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(init);
+
+window.__video = {
+  TOTAL,
+  render(theme){ document.documentElement.classList.add('render'); if (theme) document.documentElement.setAttribute('data-theme', theme); stage.style.setProperty('--k', 1); collect(); },
+  at(s){ t = s; apply(); }
+};
+})();
+</script>
+</body>
+</html>
