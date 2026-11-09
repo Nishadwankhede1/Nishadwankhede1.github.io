@@ -1,6 +1,6 @@
 # UAE industry dashboards
 
-Four interactive dashboards on synthetic UAE data, plus the CSV files behind them.
+Five interactive dashboards on synthetic UAE data, plus the CSV files behind them.
 
 | File | What it shows |
 |---|---|
@@ -9,6 +9,8 @@ Four interactive dashboards on synthetic UAE data, plus the CSV files behind the
 | `ecommerce.html` | UAE online store: revenue, cash on delivery, returns, delivery speed by emirate |
 | `asset-management.html` | DIFC fund house: AUM, net flows, performance vs benchmark, client call list, liquidity |
 | `logistics.html` | UAE 3PL: on-time delivery by lane, causes of delay, cost per kg, transit times |
+| `procurement.html` | MEP contractor procurement: spend, negotiated savings, price vs market (LME copper), supplier scorecard, PR-to-PO cycle, maverick spend |
+| `power-bi/MEP-Procurement-PowerBI.zip` | The MEP Procurement Power BI project (4 pages, 48 DAX measures; open the .pbip in Power BI Desktop) |
 | `power-bi.html` | The Power BI version of the asset management dashboard: model, key DAX measures, download link |
 | `power-bi/DIFC-Fund-House-PowerBI.zip` | The Power BI project itself (open the .pbip in Power BI Desktop) |
 | `data/*.csv` | The datasets, for rebuilding each dashboard in Power BI |

@@ -46,7 +46,7 @@ h1 { font-size: 1.15rem; font-weight: 600; margin: 0 0 4px; }
 .section h2 { font-size: 1.08rem; font-weight: 600; margin: 0 0 4px; }
 .section > p { color: var(--muted); margin: 0 0 14px; max-width: 76ch; }
 
-.reports { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+.reports { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
 .rep { border: 1px solid var(--rule); border-top: 4px solid var(--c); border-radius: 0 0 8px 8px; background: var(--surface); padding: 16px 14px 16px; cursor: pointer; transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease; position: relative; }
 .rep:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,.06); }
 .rep.active { border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink); }
@@ -66,6 +66,25 @@ h1 { font-size: 1.15rem; font-weight: 600; margin: 0 0 4px; }
 
 .video-container { margin: 18px 0; border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: #000; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
 .video-container video { display: block; width: 100%; max-height: 700px; aspect-ratio: 16/9; object-fit: contain; background: #17212b; }
+
+.chapters { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 0; }
+.chapters button { font: inherit; font-size: 12.5px; border: 1px solid var(--rule); background: var(--surface, transparent); color: var(--ink); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.chapters button:hover { border-color: var(--accent); }
+.chapters b { color: var(--accent); font-weight: 600; margin-right: 4px; font-variant-numeric: tabular-nums; }
+.walk { display: grid; gap: 14px; margin-top: 16px; }
+.walk-step { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 16px 18px; border: 1px solid var(--rule); border-radius: 10px; background: var(--surface, transparent); }
+.walk-time { font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; font-size: 15px; padding-top: 1px; }
+.walk-step h3 { margin: 0 0 6px; font-size: 15px; font-weight: 600; }
+.walk-step p { margin: 0 0 6px; }
+.walk-step ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+.walk-step li { margin: 3px 0; }
+.findings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+.findings > div { border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 8px; padding: 12px 14px; }
+.findings p { margin: 4px 0 0; font-size: 13.5px; color: var(--muted); }
+.kpidef { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; margin-top: 12px; }
+.kpidef > div { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); font-size: 14px; }
+.kpidef span { color: var(--muted); }
+@media (max-width: 760px) { .findings, .kpidef { grid-template-columns: minmax(0, 1fr); } .kpidef > div { grid-template-columns: minmax(0, 1fr); gap: 2px; } .walk-step { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
 
 /* PIPELINE DATA FLOW ANIMATION */
 .lineage-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; flex-wrap: wrap; gap: 10px; }
@@ -155,7 +174,7 @@ footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top:
 <body>
 <header class="top">
   <a class="home" href="../">Nishad Wankhede</a>
-  <nav aria-label="Dashboards"><a href="./">All dashboards</a><a href="real-estate.html">Real estate</a><a href="ecommerce.html">E-commerce</a><a href="asset-management.html">Asset management</a><a href="logistics.html">Logistics</a><a href="power-bi.html" aria-current="page">Power BI</a></nav>
+  <nav aria-label="Dashboards"><a href="./">All dashboards</a><a href="real-estate.html">Real estate</a><a href="ecommerce.html">E-commerce</a><a href="asset-management.html">Asset management</a><a href="logistics.html">Logistics</a><a href="procurement.html">Procurement</a><a href="power-bi.html" aria-current="page">Power BI</a></nav>
 </header>
 <main>
   <section class="pbi-hero">
@@ -165,7 +184,17 @@ footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top:
 
   <!-- Report Selector Tabs -->
   <div class="reports">
-    <article class="rep active" id="card-shelf" onclick="showReport('shelf')" style="--c:#1d7a4c">
+    <article class="rep active" id="card-procurement" onclick="showReport('procurement')" style="--c:#b8622a">
+      <p class="ind">Procurement &middot; Live Video</p>
+      <h3>MEP Procurement</h3>
+      <p>AED 811M of POs: savings, price vs market as LME copper rose, supplier scorecard, PR-to-PO cycle and maverick spend.</p>
+      <div class="links">
+        <button type="button" class="button" onclick="event.stopPropagation(); requestDownload('MEP Procurement')">Download .pbip</button>
+        <a class="button sec" href="procurement.html" onclick="event.stopPropagation()">Web version</a>
+      </div>
+    </article>
+
+    <article class="rep" id="card-shelf" onclick="showReport('shelf')" style="--c:#1d7a4c">
       <p class="ind">FMCG &middot; Live Video</p>
       <h3>Shelf and Sales</h3>
       <p>AED 1.6bn sell-out across 7 channels. Margin vs promo share, on-shelf availability, and AI decomposition tree.</p>
@@ -206,8 +235,313 @@ footer { max-width: 1180px; margin: 0 auto; padding: 20px 24px 44px; border-top:
     </article>
   </div>
 
-  <!-- VIEW 1: SHELF AND SALES (ACTIVE BY DEFAULT) -->
-  <div id="view-shelf" class="detail-view active">
+  <!-- VIEW 0: MEP PROCUREMENT (ACTIVE BY DEFAULT) -->
+  <div id="view-procurement" class="detail-view active">
+    <section class="section">
+      <h2>MEP Procurement &mdash; Report Walkthrough</h2>
+      <p>Executive walkthrough of the <strong>MEP Procurement</strong> report running in Power BI Desktop. It follows the questions a procurement manager at a UAE MEP contractor asks every week: what have we committed, what did negotiation save, where are we paying above market as <strong>LME copper</strong> rises, which suppliers deliver late or fail inspection, and how clean the PR-to-PO process is. The video slices the same report by year, project and discipline, then uses the AI Decomposition Tree to trace spend back to one supplier on one project.</p>
+
+      <div class="video-container">
+        <video id="procVideo" controls playsinline preload="metadata" poster="power-bi/procurement-analyst-poster.jpg">
+          <source src="power-bi/procurement-analyst-demo.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      <div class="chapters" aria-label="Jump to a chapter">
+        <button type="button" onclick="seekProc(0)"><b>0:00</b> Executive overview</button>
+        <button type="button" onclick="seekProc(8)"><b>0:08</b> Drill into one project</button>
+        <button type="button" onclick="seekProc(16)"><b>0:16</b> Project + discipline</button>
+        <button type="button" onclick="seekProc(31)"><b>0:31</b> Supplier performance</button>
+        <button type="button" onclick="seekProc(55)"><b>0:55</b> One project&rsquo;s suppliers</button>
+        <button type="button" onclick="seekProc(71)"><b>1:11</b> Process and compliance</button>
+        <button type="button" onclick="seekProc(92)"><b>1:32</b> Decomposition tree</button>
+      </div>
+
+      <div style="margin-top:16px; display:flex; gap:10px; flex-wrap:wrap">
+        <a href="procurement.html" class="button" style="display:inline-flex; align-items:center; gap:6px;">Launch Interactive Web Dashboard &rarr;</a>
+        <button type="button" class="button sec" onclick="requestDownload('MEP Procurement')">Download .pbip</button>
+      </div>
+    </section>
+
+    <!-- What the walkthrough shows -->
+    <section class="section">
+      <h2>What the Walkthrough Shows, Step by Step</h2>
+      <p>Every number below is read straight off the report in the video. The headline sentence at the top of each page is a DAX measure, so it rewrites itself every time a slicer changes.</p>
+
+      <div class="walk">
+        <div class="walk-step">
+          <span class="walk-time">0:00</span>
+          <div>
+            <h3>Executive overview, 2026 year to date</h3>
+            <p>With the Year slicer on 2026, the report shows <b>AED 442.9M</b> committed on 1,251 purchase orders with 26 suppliers, <b>up 68%</b> on the same months of 2025. Negotiation saved <b>AED 17.2M (3.7%)</b> against first quotes, but the price we paid ran <b>+1.7% above the market benchmark</b>, and only <b>28.9%</b> of spend sat on framework agreements. The headline calls out the biggest leak straight away: <b>Chillers cost AED 6.0M above market</b>, and the weakest supplier on delivery was Pearl Valves Trading at 54% on time.</p>
+            <ul>
+              <li><b>Monthly spend and savings rate</b> &mdash; combo chart, spend columns against the negotiated-savings line, so a month with heavy buying but thin savings stands out.</li>
+              <li><b>Spend by discipline</b> &mdash; Electrical and HVAC dominate, driven by cables, switchgear, chillers and generators.</li>
+              <li><b>Spend vs budget by project</b> &mdash; actual PO value against the same quantities at budget rates frozen at each project&rsquo;s start.</li>
+              <li><b>Where we paid above market</b> &mdash; price variance by category, only categories above benchmark: Chillers, Generators, Switchgear, Fire alarm.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="walk-step">
+          <span class="walk-time">0:08</span>
+          <div>
+            <h3>Drill into one project: Creekside Residences Tower</h3>
+            <p>Picking a single project re-scopes every visual. Creekside committed <b>AED 71.3M</b> in 2026, saved <b>AED 2.8M (3.8%)</b>, paid <b>+2.3% above market</b> &mdash; worse than the portfolio &mdash; and achieved <b>81.4%</b> on-time delivery. The headline now names a different weak supplier for this project (Emirates Ductwork Industries), which is exactly the conversation a project procurement lead needs to have.</p>
+          </div>
+        </div>
+
+        <div class="walk-step">
+          <span class="walk-time">0:16</span>
+          <div>
+            <h3>Project + discipline: Creekside fire fighting package</h3>
+            <p>Adding the Discipline slicer narrows to one trade package: <b>AED 4.3M</b> on 22 POs with 4 suppliers. Delivery is strong at <b>95.2%</b> on time, but price is not: <b>+3.4% above market</b>, and the headline isolates <b>Fire alarm devices at AED 0.2M above market</b>. Hovering the donut shows Fire fighting as 100% of the selection, confirming the filter context.</p>
+          </div>
+        </div>
+
+        <div class="walk-step">
+          <span class="walk-time">0:31</span>
+          <div>
+            <h3>Supplier performance, full period</h3>
+            <p>All years: <b>26 active suppliers</b>, <b>78.8%</b> on-time delivery, late deliveries average <b>9.0 days</b>, a <b>5.3%</b> non-conformance (NCR) rate, <b>89.5%</b> of invoices passing the PO / GRN / invoice 3-way match first time, and <b>6 open POs</b> already past their need-by date. The weakest on delivery across the whole period is <b>Hanzhou HVAC Export Co at 53%</b> on time.</p>
+            <ul>
+              <li><b>Delivery vs price by supplier</b> &mdash; a bubble per supplier: on-time % across, price vs market up, bubble size = spend. Bottom-right is fast and cheap; top-left needs action.</li>
+              <li><b>Supplier concentration (Pareto)</b> &mdash; spend by supplier with a cumulative-share line built with <code>ALLSELECTED</code>, showing how few suppliers carry most of the spend.</li>
+              <li><b>Supplier scorecard</b> &mdash; one row per supplier with origin (Local / GCC / Import), ICV certification and a weighted score.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="walk-step">
+          <span class="walk-time">0:55</span>
+          <div>
+            <h3>One project&rsquo;s suppliers: JAFZA Logistics Hub</h3>
+            <p>In 2026, JAFZA committed <b>AED 37.3M</b> with 25 suppliers: <b>85.4%</b> on time and late deliveries only <b>5.1 days</b> late on average, but an <b>8.5% NCR rate</b> &mdash; well above the 5.3% portfolio average &mdash; so the issue on this site is quality, not speed. Narrowing further to its fire fighting package shows 4 suppliers at <b>92.9%</b> on time, a 100% first-pass invoice match, and Fire alarm again <b>AED 0.1M above market</b>.</p>
+          </div>
+        </div>
+
+        <div class="walk-step">
+          <span class="walk-time">1:11</span>
+          <div>
+            <h3>Process and compliance</h3>
+            <p>Requisition to purchase order takes <b>12.1 days</b> on average. <b>79.3%</b> of spend went through a framework agreement or competitive tender; <b>3.6%</b> was maverick spend (a PO raised before an approved requisition); <b>12.9%</b> was single source and <b>7.8%</b> spot buys; tenders drew <b>3.7 bids</b> on average. Switching to 2026 shows the cycle-time ranking by buyer: <b>Sami Haddad at 14.7 days</b> against <b>Aisha Rahman at 9.9</b> &mdash; a five-day gap on the same process that is worth a workload or approval-routing review.</p>
+            <ul>
+              <li><b>Compliance trend</b> &mdash; maverick and single-source share of spend month by month, so a spike after a site emergency is visible immediately.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="walk-step">
+          <span class="walk-time">1:32</span>
+          <div>
+            <h3>AI Decomposition Tree: where the money actually goes</h3>
+            <p>Starting from total 2026 spend, the tree splits by <b>Supplier</b> (largest: <b>Al Wasl Cables, AED 31.8M</b>), then by <b>Project</b> (Creekside Residences Tower, <b>AED 3.7M</b> of that), then by <b>Discipline</b> (Electrical). In three clicks a manager goes from a portfolio number to one supplier&rsquo;s cable orders on one site &mdash; the starting point for a volume-rebate or framework renegotiation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Findings -->
+    <section class="section">
+      <h2>Findings a Procurement Manager Would Act On</h2>
+      <div class="findings">
+        <div><b>Renegotiate chillers.</b><p>Chillers are the single largest overpayment: AED 10.7M above benchmark over the period (+7.7%), concentrated in one imported supplier priced well above local alternatives.</p></div>
+        <div><b>Hedge copper-linked items.</b><p>LV cable prices tracked LME copper up through 2026. Budgets priced at project start now show overruns even where the buying itself was below market &mdash; a case for copper-indexed framework pricing.</p></div>
+        <div><b>Review two supplier contracts.</b><p>Hanzhou HVAC Export Co (53% on time, 13.5% NCR) and Coolline Trading LLC (63% on time) score below 60 and are flagged &ldquo;Review contract&rdquo;.</p></div>
+        <div><b>Move spend onto frameworks.</b><p>Only about 30% of spend is on framework agreements. High-volume commodities (cable, pipe, containment, ductwork) are the natural candidates.</p></div>
+        <div><b>Close the buyer cycle-time gap.</b><p>A five-day spread in PR-to-PO time between buyers on the same process points to approval routing or workload, not market conditions.</p></div>
+        <div><b>Fix quality at JAFZA.</b><p>An 8.5% NCR rate at one site against 5.3% overall means inspection and supplier qualification on that project need attention.</p></div>
+      </div>
+    </section>
+
+    <!-- Data Lineage -->
+    <section class="section">
+      <div class="lineage-header">
+        <div>
+          <h2>Data Lineage &amp; ETL Pipeline</h2>
+          <p style="margin:4px 0 0; color:var(--muted); font-size:13.5px;">How 2,321 purchase orders flow from ERP requisitions, goods receipts and supplier invoices into the Power BI semantic model.</p>
+        </div>
+        <div class="stream-status">
+          <span class="stream-pulse"></span>
+          <span>Procure-to-Pay &bull; Monthly Refresh</span>
+        </div>
+      </div>
+
+      <div class="lineage-container">
+        <div class="flow-track">
+          <div class="flow-track-stream"></div>
+          <div class="flow-track-stream delay-1"></div>
+        </div>
+
+        <div class="lineage-grid">
+          <div class="lineage-step">
+            <div class="step-top"><span class="step-badge"><span class="step-pulse-dot"></span> 1. Ingestion</span></div>
+            <h4>ERP Procure-to-Pay</h4>
+            <p>Purchase requisitions, PO headers and lines, goods receipt notes (GRN), supplier invoices, NCR log, plus the monthly LME copper price and item benchmark rates.</p>
+            <div class="flow-meta"><span>Source Cadence</span><span class="flow-rate">Daily ERP extract</span></div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top"><span class="step-badge"><span class="step-pulse-dot"></span> 2. Power Query (M)</span></div>
+            <h4>ETL &amp; Business Rules</h4>
+            <p>Joins PR &rarr; PO &rarr; GRN &rarr; invoice on PO number, computes PR-to-PO days and days late against need-by date, flags maverick POs, indexes copper-linked benchmarks and freezes budget rates at project start.</p>
+            <div class="flow-meta"><span>Engine</span><span class="flow-rate">Mashup M Engine</span></div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top"><span class="step-badge"><span class="step-pulse-dot"></span> 3. Data Model</span></div>
+            <h4>Star Schema</h4>
+            <p>Central <code>Purchase Orders</code> fact linked 1-to-many with <code>Suppliers</code>, <code>Items</code>, <code>Projects</code> and a month-level <code>Calendar</code>; a disconnected <code>Metric</code> table drives the metric picker.</p>
+            <div class="flow-meta"><span>Cardinality</span><span class="flow-rate">1 : &infin; Star Schema</span></div>
+          </div>
+          <div class="lineage-step">
+            <div class="step-top"><span class="step-badge"><span class="step-pulse-dot"></span> 4. Presentation</span></div>
+            <h4>Power BI Report</h4>
+            <p>48 DAX measures in six folders, a self-writing headline, weighted supplier score with recommended action, Pareto, like-for-like YoY and an AI Decomposition Tree.</p>
+            <div class="flow-meta"><span>Analytics</span><span class="flow-rate">VertiPaq In-Memory</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Star Schema Model -->
+    <section class="section">
+      <h2>Inside the MEP Procurement Star Schema</h2>
+      <p>One fact table at purchase-order grain with four conformed dimensions and a disconnected metric table. Every KPI on the report is a measure, so it stays correct under any combination of slicers.</p>
+      <div class="model">
+        <div class="tbl fact">
+          <h3>Purchase Orders</h3>
+          <p class="kind">Central Fact (2,321 rows)</p>
+          <ul><li>PR / PO / Need-by / Delivered dates</li><li>PO, Quoted, Budget, Benchmark value</li><li>Quantity and unit prices</li><li>Contract type, bids, buyer</li><li>Days late, On time, NCR</li><li>First-pass 3-way match</li></ul>
+        </div>
+        <div class="tbl"><h3>Suppliers</h3><p class="kind">Dimension (26 rows)</p><ul><li>Supplier type</li><li>Country</li><li>Origin: Local / GCC / Import</li><li>ICV certified</li></ul></div>
+        <div class="tbl"><h3>Items</h3><p class="kind">Dimension (24 rows)</p><ul><li>Item and unit</li><li>Category</li><li>Discipline: HVAC, Electrical, Plumbing, Fire fighting, ELV and BMS</li><li>Copper linked</li><li>Lead time</li></ul></div>
+        <div class="tbl"><h3>Projects</h3><p class="kind">Dimension (8 rows)</p><ul><li>Project</li><li>Emirate</li><li>Sector</li><li>MEP procurement budget</li></ul></div>
+        <div class="tbl"><h3>Calendar</h3><p class="kind">Month Dimension (22 rows)</p><ul><li>Year, Quarter, Month</li><li>Month Number (drives PY)</li><li>LME copper USD/t</li></ul></div>
+      </div>
+    </section>
+
+    <!-- KPI dictionary -->
+    <section class="section">
+      <h2>KPI Definitions</h2>
+      <p>The procurement KPIs used on the report and exactly how each is calculated.</p>
+      <div class="kpidef">
+        <div><b>Committed spend</b><span>Sum of PO value issued in the period.</span></div>
+        <div><b>Negotiated savings</b><span>First quote minus final PO value; savings % divides by quoted value.</span></div>
+        <div><b>Price vs market (PPV)</b><span>PO value minus the benchmark rate in the PO month &times; quantity. Positive = paid above market.</span></div>
+        <div><b>Variance to budget</b><span>Ordered quantity at budget rates (frozen at project start) minus PO value.</span></div>
+        <div><b>On-time delivery</b><span>Delivered POs received on or before the need-by date, over all delivered POs.</span></div>
+        <div><b>Avg days late</b><span>Average delay of late deliveries only.</span></div>
+        <div><b>NCR rate</b><span>Deliveries with a non-conformance report, over delivered POs.</span></div>
+        <div><b>First-pass invoice match</b><span>Invoices passing the PO / GRN / invoice 3-way match first time.</span></div>
+        <div><b>PR to PO cycle</b><span>Days from approved requisition to purchase order.</span></div>
+        <div><b>Maverick spend</b><span>Spend with no approved requisition before the PO was raised.</span></div>
+        <div><b>Competitive spend</b><span>Spend under a framework agreement or competitive tender.</span></div>
+        <div><b>Supplier score</b><span>40% on-time + 30% quality + 30% price vs market, on a 0&ndash;100 scale.</span></div>
+      </div>
+    </section>
+
+    <!-- DAX Measures -->
+    <section class="section">
+      <h2>Core MEP Procurement DAX Measures</h2>
+      <p>48 measures in six display folders: Spend, Savings, Price, Supplier, Process and Narrative.</p>
+      <div class="dax">
+        <div>
+          <h3>Automated Narrative Headline</h3>
+          <p>Finds the category with the largest overpayment and the least reliable supplier (15+ deliveries), then writes the sentence that opens every page. This is what changes in the video every time a slicer moves.</p>
+          <pre><code>Headline =
+VAR cats = ADDCOLUMNS ( VALUES ( Items[Category] ), "@ppv", [PPV] )
+VAR topCat = TOPN ( 1, cats, [@ppv], DESC )
+VAR supps =
+    FILTER (
+        ADDCOLUMNS ( VALUES ( Suppliers[Supplier] ),
+            "@d", [Delivered POs], "@otd", [On-time delivery %] ),
+        [@d] &gt;= 15
+    )
+VAR worst = TOPN ( 1, supps, [@otd], ASC )
+RETURN
+    "Negotiation saved AED " &amp; FORMAT ( [Negotiated savings] / 1000000, "#,0.0" ) &amp; "M ("
+        &amp; FORMAT ( [Savings %], "0.0%" ) &amp; "), but " &amp; MAXX ( topCat, Items[Category] )
+        &amp; " cost AED " &amp; FORMAT ( MAXX ( topCat, [@ppv] ) / 1000000, "#,0.0" ) &amp; "M above market."
+        &amp; " Weakest on delivery: " &amp; MAXX ( worst, Suppliers[Supplier] )
+        &amp; " at " &amp; FORMAT ( MAXX ( worst, [@otd] ), "0%" ) &amp; " on time."</code></pre>
+        </div>
+        <div>
+          <h3>Purchase Price Variance vs Market</h3>
+          <p>Separates market inflation from buying performance: each PO is compared with the benchmark rate in its own month, and copper-linked items move with LME copper.</p>
+          <pre><code>PPV = [Spend] - [Benchmark value]
+
+PPV % = DIVIDE ( [PPV], [Benchmark value] )
+
+PPV above market AED M = IF ( [PPV] &gt; 0, [PPV] / 1000000 )</code></pre>
+        </div>
+        <div>
+          <h3>Weighted Supplier Score and Action</h3>
+          <p>One number per supplier from delivery, quality and price, then turned into a recommendation for the category manager.</p>
+          <pre><code>Supplier score =
+VAR otd = [On-time delivery %]
+VAR quality = MAX ( 0, 1 - 5 * [NCR rate] )
+VAR price = MIN ( 1, MAX ( 0, 0.5 - 5 * [PPV %] ) )
+RETURN
+    IF ( NOT ISBLANK ( otd ),
+        100 * ( 0.4 * otd + 0.3 * quality + 0.3 * price ) )
+
+Supplier action =
+VAR s = [Supplier score]
+RETURN
+    SWITCH ( TRUE (),
+        ISBLANK ( s ), BLANK (),
+        s &lt; 60, "Review contract",
+        s &lt; 72, "Improvement plan",
+        "Preferred" )</code></pre>
+        </div>
+        <div>
+          <h3>Supplier Pareto (Cumulative Share)</h3>
+          <p>Running share of spend, largest supplier first, respecting every slicer through <code>ALLSELECTED</code>.</p>
+          <pre><code>Cumulative spend % =
+VAR thisSpend = [Spend]
+VAR allSupp = ALLSELECTED ( Suppliers[Supplier] )
+RETURN
+    DIVIDE (
+        SUMX ( FILTER ( allSupp, [Spend] &gt;= thisSpend ), [Spend] ),
+        CALCULATE ( [Spend], allSupp )
+    )</code></pre>
+        </div>
+        <div>
+          <h3>Like-for-like Prior Year (the &ldquo;up 68%&rdquo; in the summary)</h3>
+          <p>Shifts any month selection back 12 months with <code>TREATAS</code>, and only compares months that have a prior-year month.</p>
+          <pre><code>Spend PY =
+VAR months = VALUES ( 'Calendar'[Month Number] )
+RETURN
+    CALCULATE ( [Spend], REMOVEFILTERS ( 'Calendar' ),
+        TREATAS ( SELECTCOLUMNS ( months, "m", 'Calendar'[Month Number] - 12 ),
+            'Calendar'[Month Number] ) )
+
+Spend comparable =
+SUMX ( FILTER ( VALUES ( 'Calendar'[Month Number] ), 'Calendar'[Month Number] &gt; 12 ), [Spend] )
+
+Spend YoY % = DIVIDE ( [Spend comparable] - [Spend PY], [Spend PY] )</code></pre>
+        </div>
+        <div>
+          <h3>Maverick Spend and PR-to-PO Cycle</h3>
+          <p>The two process KPIs on the compliance page.</p>
+          <pre><code>Maverick spend % =
+DIVIDE (
+    CALCULATE ( [Spend], 'Purchase Orders'[PR Raised] = "No" ),
+    [Spend]
+)
+
+Avg PR to PO days =
+CALCULATE (
+    AVERAGE ( 'Purchase Orders'[PR to PO Days] ),
+    'Purchase Orders'[PR Raised] = "Yes"
+)</code></pre>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- VIEW 1: SHELF AND SALES -->
+  <div id="view-shelf" class="detail-view">
     <section class="section">
       <h2>Shelf and Sales &mdash; Report Walkthrough</h2>
       <p>Refined executive walkthrough of the live <strong>Shelf and Sales</strong> report running in Power BI Service. Watch the real-time slicer response, channel scorecard, and multi-page layout.</p>
@@ -1041,13 +1375,21 @@ DIVIDE (
 </footer>
 
 <script>
-  let currentProject = 'Shelf and Sales';
+  let currentProject = 'MEP Procurement';
   const downloadMap = {
+    'MEP Procurement': 'power-bi/MEP-Procurement-PowerBI.zip',
     'Shelf and Sales': 'power-bi/Shelf-and-Sales-PowerBI.zip',
     'DIFC Fund House': 'power-bi/DIFC-Fund-House-PowerBI.zip',
     'Property Pulse': 'power-bi/Dubai-Property-Pulse-PowerBI.zip',
     'Checkout Analytics': 'power-bi/Checkout-Analytics-PowerBI.zip'
   };
+
+  function seekProc(sec) {
+    const v = document.getElementById('procVideo');
+    if (!v) return;
+    v.currentTime = sec; v.play().catch(() => {});
+    v.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 
   function showReport(id) {
     document.querySelectorAll('.rep').forEach(el => el.classList.remove('active'));

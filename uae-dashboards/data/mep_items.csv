@@ -1,0 +1,25 @@
+Item,Category,Discipline,Unit,Copper Linked,Lead Time Days
+Air-cooled chiller 400 TR,Chillers,HVAC,nos,No,120
+Fresh air handling unit,Air handling units,HVAC,nos,No,75
+Fan coil unit,Fan coil units,HVAC,nos,No,45
+GI ductwork,Ductwork,HVAC,kg,No,21
+Duct and pipe insulation,Insulation,HVAC,m2,No,18
+Chilled water pump set,Pumps,HVAC,nos,No,60
+LV power cable 4C x 95 mm2,LV cables,Electrical,m,Yes,28
+MV cable 11 kV 3C x 240 mm2,MV cables,Electrical,m,Yes,45
+Main distribution board,Switchgear,Electrical,nos,No,95
+Sub-main distribution board,Distribution boards,Electrical,nos,No,40
+Cable tray and trunking,Containment,Electrical,m,No,21
+LED light fitting,Lighting,Electrical,nos,No,35
+"Diesel generator 1,500 kVA",Generators,Electrical,nos,No,110
+PPR pipe and fittings,Pipes and fittings,Plumbing,m,No,20
+Copper pipe type L,Copper pipes,Plumbing,m,Yes,25
+Valves and strainers,Valves,Plumbing,nos,No,30
+Sanitaryware set,Sanitaryware,Plumbing,nos,No,40
+Sprinkler head,Sprinklers,Fire fighting,nos,No,30
+Fire pump set (UL/FM),Fire pumps,Fire fighting,sets,No,100
+Black steel pipe sch 40,Fire pipes,Fire fighting,m,No,25
+Addressable fire alarm device,Fire alarm,Fire fighting,nos,No,35
+BMS controller,BMS,ELV and BMS,nos,No,50
+IP CCTV camera,CCTV,ELV and BMS,nos,No,30
+Cat6A structured cabling,Structured cabling,ELV and BMS,m,No,21
